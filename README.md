@@ -1,2 +1,4 @@
 # swmm_calibration
-Framework for calibrating SWMM models.
+A framework for calibrating SWMM models. Mostly built with other people's work:
+- PYSWMM
+- SPOTPY
