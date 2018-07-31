@@ -1,0 +1,206 @@
+[TITLE]
+;;Project Title/Notes
+
+[OPTIONS]
+;;Option             Value
+FLOW_UNITS           LPS
+INFILTRATION         HORTON
+FLOW_ROUTING         DYNWAVE
+LINK_OFFSETS         DEPTH
+MIN_SLOPE            0
+ALLOW_PONDING        NO
+SKIP_STEADY_STATE    NO
+
+START_DATE           06/24/2016
+START_TIME           13:41:24
+REPORT_START_DATE    06/24/2016
+REPORT_START_TIME    13:41:24
+END_DATE             06/24/2016
+END_TIME             13:50:00
+SWEEP_START          01/01
+SWEEP_END            12/31
+DRY_DAYS             0
+REPORT_STEP          00:00:05
+WET_STEP             00:00:01
+DRY_STEP             00:01:00
+ROUTING_STEP         0.1
+
+INERTIAL_DAMPING     NONE
+NORMAL_FLOW_LIMITED  BOTH
+FORCE_MAIN_EQUATION  H-W
+VARIABLE_STEP        0.75
+LENGTHENING_STEP     0
+MIN_SURFAREA         1.14
+MAX_TRIALS           8
+HEAD_TOLERANCE       0.0015
+SYS_FLOW_TOL         5
+LAT_FLOW_TOL         5
+MINIMUM_STEP         0.5
+THREADS              4
+
+[EVAPORATION]
+;;Data Source    Parameters
+;;-------------- ----------------
+CONSTANT         0.0
+DRY_ONLY         NO
+
+[JUNCTIONS]
+;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded   
+;;-------------- ---------- ---------- ---------- ---------- ----------
+2                417.98     0          0          10         0         
+4                417.26     0.3272     0          10         0         
+6                417.26     0.3272     0          10         0         
+7                417.26     0.3272     0          10         0         
+8                417.26     0.3272     0          10         0         
+9                417.26     0.3272     0          10         0         
+10               417.26     0.3272     0          10         0         
+13               419.125    0.1762     0          10         0         
+16               417.41     2.35       0          10         0         
+18               418.34     1.6        0          10         0         
+20               417.44     1          0          10         0         
+23               418.35     1.6        0          10         0         
+11               417.94     0          0          10         0         
+15               417.94     0          0          0          0         
+24               419.94     0          0          0          0         
+25               419.76     0          0          0          0         
+27               419.47     0          0          10         0         
+
+[OUTFALLS]
+;;Name           Elevation  Type       Stage Data       Gated    Route To        
+;;-------------- ---------- ---------- ---------------- -------- ----------------
+5                417.78     FREE                        NO                       
+
+[STORAGE]
+;;Name           Elev.    MaxDepth   InitDepth  Shape      Curve Name/Params            N/A      Fevap    Psi      Ksat     IMD     
+;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
+Ramp             419.94   10         0          FUNCTIONAL 55        0         60       0        0       
+House            418.44   1          0          FUNCTIONAL 0         0         43       0        0       
+;Exit shaft
+Exitshaft        417.94   1.5        0          FUNCTIONAL 0         0         6.24     0        0       
+
+[CONDUITS]
+;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow   
+;;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------
+4                13               16               5.3        0.01       0          1.68       0          0         
+13               9                20               13         0.01       0          0          0          0         
+17               6                4                0.96       0.01       0          0          0          0         
+18               8                6                1.83       0.01       0          0          0          0         
+19               9                8                0.42       0.01       0          0          0          0         
+20               10               9                0.49       0.01       0          0          0          0         
+22               4                7                0.7        0.01       0          0          0          0         
+29               16               10               15.65      0.01       0          0          0          0         
+30               23               13               2.35       0.01       0.8        0          0          0         
+31               18               13               3.2        0.01       0.8        0          0          0         
+5                4                11               1.2        0.01       0.68       0          0          0         
+23               24               25               7.5        0.01       0          0          0          0         
+Surfaceflow      25               27               18.5       0.01       0          0          0          0         
+27               4                2                20         0.01       0.68       0          0          0         
+28               15               5                30         0.01       0          0          0          0         
+
+[ORIFICES]
+;;Name           From Node        To Node          Type         Offset     Qcoeff     Gated    CloseTime 
+;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- ----------
+3                House            20               BOTTOM       0          0.65       NO       0         
+6                Exitshaft        11               SIDE         0          0.65       NO       0         
+7                Exitshaft        15               SIDE         0          0.3        NO       0         
+10               25               16               BOTTOM       0          0.65       NO       0         
+16               Ramp             23               BOTTOM       0          .6         NO       0         
+21               Ramp             18               BOTTOM       0          .6         NO       0         
+
+[WEIRS]
+;;Name           From Node        To Node          Type         CrestHt    Qcoeff     Gated    EndCon   EndCoeff   Surcharge  RoadWidth  RoadSurf  
+;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- -------- ---------- ---------- ---------- ----------
+Overflow         Ramp             24               TRANSVERSE   0.6        3.33       NO       0        0          YES       
+11               27               Exitshaft        TRANSVERSE   0          3.33       NO       0        0          YES       
+
+[XSECTIONS]
+;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels    Culvert   
+;;-------------- ------------ ---------------- ---------- ---------- ---------- ---------- ----------
+4                CIRCULAR     0.1762           0          0          0          1                    
+13               CIRCULAR     0.1472           0          0          0          1                    
+17               CIRCULAR     0.3272           0          0          0          1                    
+18               CIRCULAR     0.3272           0          0          0          1                    
+19               CIRCULAR     0.3272           0          0          0          1                    
+20               CIRCULAR     0.3272           0          0          0          1                    
+22               CIRCULAR     0.3272           0          0          0          1                    
+29               CIRCULAR     0.000001         0          0          0          1                    
+30               CIRCULAR     0.1762           0          0          0          1                    
+31               CIRCULAR     0.1762           0          0          0          1                    
+5                CIRCULAR     .327             0          0          0          1                    
+23               RECT_OPEN    1                1          0          0          1                    
+Surfaceflow      RECT_OPEN    1                1.5        0          0          1                    
+27               CIRCULAR     .327             0          0          0          1                    
+28               CIRCULAR     .29              0          0          0          1                    
+3                CIRCULAR     .6               0          0          0
+6                CIRCULAR     .3               0          0          0
+7                CIRCULAR     .3               0          0          0
+10               CIRCULAR     .6               0          0          0
+16               CIRCULAR     .6               0          0          0
+21               RECT_CLOSED  .6               .6         0          0
+Overflow         RECT_OPEN    1                1          0          0         
+11               RECT_OPEN    1                2.5        0          0         
+
+[INFLOWS]
+;;Node           Constituent      Time Series      Type     Mfactor  Sfactor  Baseline Pattern
+;;-------------- ---------------- ---------------- -------- -------- -------- -------- --------
+Ramp             FLOW             forcingData            FLOW     1.0      2
+
+[TIMESERIES]
+;;Name           Date       Time       Value     
+;;-------------- ---------- ---------- ----------
+forcingData      FILE "$forcing_data_file"
+;
+
+[REPORT]
+;;Reporting Options
+INPUT      NO
+CONTROLS   NO
+SUBCATCHMENTS ALL
+NODES ALL
+LINKS ALL
+
+[TAGS]
+Link       13               Diam=0.1472     
+Link       29               D=0.184         
+Link       30               D=0.1762        
+
+[MAP]
+DIMENSIONS 618596.772 231480.893 618629.306 231507.544
+Units      Meters
+
+[COORDINATES]
+;;Node           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+2                618600.868         231485.926        
+4                618612.515         231502.331        
+6                618612.027         231501.497        
+7                618612.828         231502.963        
+8                618611.073         231499.871        
+9                618610.847         231499.503        
+10               618610.588         231499.088        
+13               618616.470         231484.780        
+16               618619.482         231489.914        
+18               618613.230         231485.238        
+20               618622.642         231493.595        
+23               618617.429         231482.533        
+11               618613.570         231501.840        
+15               618614.131         231503.178        
+24               618612.833         231486.547        
+25               618618.193         231489.610        
+27               618613.644         231500.431        
+5                618584.420         231504.676        
+Ramp             618610.917         231485.016        
+House            618623.378         231495.780        
+Exitshaft        618615.326         231501.435        
+
+[VERTICES]
+;;Link           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+29               618608.422         231495.498        
+30               618617.115         231484.386        
+31               618615.167         231485.432        
+Surfaceflow      618609.505         231494.115        
+27               618612.085         231502.525        
+27               618611.157         231502.374        
+28               618611.971         231504.227        
+
