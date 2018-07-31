@@ -3,6 +3,7 @@ import subprocess
 from string import Template
 import pandas
 from os.path import join
+from swmmtoolbox import swmmtoolbox
 
 
 class SwmmModel(object):
@@ -13,29 +14,58 @@ class SwmmModel(object):
             parameter_bounds: physical parameter boundaries
     Output: Initialized model instance with forcing data (inflow to experiment site) and evaluation data (water level in basement of house)
     """
-    temp_folder = './'  #'C:/_temp'
+    temp_folder = 'C:/_temp/swmm'
     swmm_executable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
-    model_file = 'testmodel.inp'
 
-    def __init__(self, data_start=None, data_end=None, model_template=None, parameter_bounds=None, calibration_points=[]):
-        self.d_f = data_start
-        self.d_e = data_end
-        self.m_t = model_template
-        self.p_b = parameter_bounds
-        self.c_p = calibration_points
+    def __init__(self, swmm_model_template, experiment_start_time, experiment_end_time, experiment_start_date,
+                 experiment_end_date, forcing_data_file, reporting_nodes, parameter_bounds):
+        self.swmm_model_template = swmm_model_template
+        self.experiment_start_date = experiment_start_date
+        self.experiment_end_date = experiment_end_date
+        self.experiment_start_time = experiment_start_time
+        self.experiment_end_time = experiment_end_time
+        self.forcing_data_file = forcing_data_file
+        self.reporting_nodes = reporting_nodes
+        self.parameter_bounds = parameter_bounds
 
-    def run(self, params):
-        return self._run(params)
+    def run(self, model_params):
+        return self._run(model_params)
 
-    @classmethod
-    def _run(cls, params):
+    def _run(self, model_params):
+
+        # check that parameters are acceptable
+        for param_name, value in model_params:
+            if value < self.parameter_bounds[param_name][0] or value > self.parameter_bounds[param_name][1]:
+                print
+                '''
+                The following combination was ignored:
+                surface roughness: %s_r
+                ##############################
+                '''.format({'s_r':model_params['s_r']})
+                return 1
+
+        # simulation params
+        params = {
+            'forcing_data_file': self.forcing_data_file,
+            'experiment_start_date': self.experiment_start_date,
+            'experiment_end_date': self.experiment_end_date,
+            'experiment_start_time': self.experiment_start_time,
+            'experiment_end_time': self.experiment_end_time,
+            's_r': model_params['s_r']
+        }
         # define input and output
-        temp_model = join(cls.temp_folder, 'temp.inp')
+        temp_model = join(self.temp_folder, 'temp.inp')
         # apply parameters to input
-        with open(cls.model_file, 'r') as t:
+        with open(self.swmm_model_template, 'r') as t:
             template = Template(t.read())
             input_mod = template.substitute(params)
         with open(temp_model, 'w') as f:
             f.write(input_mod)
-        output_file = join(cls.temp_folder, 'testoutput.out')
-        subprocess.call([cls.swmm_executable, temp_model, output_file])
+        output_file = join(self.temp_folder, 'testoutput.out')
+        report_file = join(self.temp_folder, 'testreport.rpt')
+        subprocess.call([self.swmm_executable, temp_model, report_file, output_file])
+
+        # read simulation output
+        data = swmmtoolbox.extract(output_file, ' '.join([','.join(x) for x in self.reporting_nodes]))
+
+        return data
