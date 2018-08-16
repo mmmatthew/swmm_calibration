@@ -11,16 +11,16 @@ MIN_SLOPE            0
 ALLOW_PONDING        NO
 SKIP_STEADY_STATE    NO
 
-START_DATE           06/24/2016
-START_TIME           13:41:24
-REPORT_START_DATE    $experiment_start_date
-REPORT_START_TIME    $experiment_start_time
-END_DATE             $experiment_end_date
-END_TIME             $experiment_end_time
+START_DATE           $sim_start_date
+START_TIME           $sim_start_time
+REPORT_START_DATE    $sim_start_date
+REPORT_START_TIME    $sim_start_time
+END_DATE             $sim_end_date
+END_TIME             $sim_end_time
 SWEEP_START          01/01
 SWEEP_END            12/31
 DRY_DAYS             0
-REPORT_STEP          00:00:05
+REPORT_STEP          $sim_report_step
 WET_STEP             00:00:01
 DRY_STEP             00:01:00
 ROUTING_STEP         0.1
