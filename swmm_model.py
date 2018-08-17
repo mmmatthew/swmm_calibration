@@ -9,6 +9,23 @@ from datetime import timedelta
 from swmmtoolbox import swmmtoolbox
 
 
+def read_floodx_file(evaluation_data_file):
+    return pd.read_csv(
+        filepath_or_buffer=evaluation_data_file,
+        index_col=0,
+        parse_dates=[0],
+        infer_datetime_format=True,
+        dayfirst=True,
+        sep=';')
+
+def resample_interpolate(data, period):
+    # aggregate per second, interpolate
+    data = data.resample(period)
+    data = data.mean()
+    data = data.resample(period)
+    return data.interpolate(method='linear')
+
+
 class SwmmModel(object):
     """
     Input:  data_start: e.g. datetime(2016,10,6,14,10)
@@ -23,31 +40,61 @@ class SwmmModel(object):
     temp_model = join(temp_folder, 'model.inp')
     output_file = join(temp_folder, 'output.out')
     report_file = join(temp_folder, 'report.rpt')
+    temp_forcing_data_file = join(temp_folder, 'forcing_data.txt')
+    observations = None
+    eval_data = None
+    eval_dates = None
 
-    def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt, sim_reporting_step, forcing_data_file, evaluation_data_file, reporting_nodes, parameter_bounds):
+    def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt, sim_reporting_step, forcing_data_file, obs_config,
+                 parameter_bounds):
 
         with open(swmm_model_template, 'r') as t:
             self.swmm_model_template = Template(t.read())
         self.sim_start_dt = sim_start_dt
         self.sim_end_dt = sim_end_dt
         self.sim_reporting_step = sim_reporting_step
-        self.forcing_data_file = forcing_data_file
-        self.evaluation_data_file = evaluation_data_file
-        self.reporting_nodes = reporting_nodes
         self.parameter_bounds = parameter_bounds
-        # Read observation data and filter to fit experiment duration
-        self.observations = pd.read_csv(
-            filepath_or_buffer=evaluation_data_file,
-            index_col=0,
-            parse_dates=[0],
-            infer_datetime_format=True,
-            dayfirst=False,
-            sep=';')
-        shift = timedelta(seconds=1)
-        self.observations = self.observations.loc[sim_start_dt+shift : sim_end_dt-shift]
+        self.obs_config = obs_config
 
-        self.eval_data = list(self.observations['value'])
-        self.eval_dates = list(self.observations.index)
+        # Read observation data and filter to fit experiment duration
+        self.read_observations(obs_config)
+
+        # Read forcing data and reformat
+        self.read_forcing(forcing_data_file)
+
+
+    def read_forcing(self, forcing_data_file):
+        data = read_floodx_file(forcing_data_file)
+        data = resample_interpolate(data, 'S')
+        data['datetime'] = data.index
+        data['date'] = data['datetime'].apply(lambda x: x.strftime('%m/%d/%Y'))
+        data['time'] = data['datetime'].apply(lambda x: x.strftime('%H:%M:%S'))
+
+        data.to_csv(self.temp_forcing_data_file,
+                    sep=' ',
+                    columns=['date', 'time', 'value'],
+                    # quoting=3,  #csv.QUOTE_NONE,
+                    index=False,
+                    header=False)
+
+    def read_observations(self, obs_config):
+        for obs in obs_config:
+            # read data
+            obs_data = read_floodx_file(obs['data_file'])
+            # resample: aggregate per second, interpolate
+            period = '{0}S'.format(int(self.sim_reporting_step.total_seconds()))
+            obs_data = resample_interpolate(obs_data, period)
+            # clip to simulation time
+            shift = timedelta(seconds=int(self.sim_reporting_step.total_seconds()))
+            obs_data = obs_data.loc[self.sim_start_dt + shift: self.sim_end_dt - shift]
+
+            self.eval_data = list(obs_data['value'])
+            self.eval_dates = list(obs_data.index)
+            # set column name and append to obs
+            if self.observations is None:
+                self.observations = obs_data.rename(index=str, columns={'value': obs['swmm_node'][1]})
+            else:
+                self.observations[obs['swmm_node'][1]] = obs_data
 
     def run(self, *model_params):
         """
@@ -75,25 +122,14 @@ class SwmmModel(object):
                             stdout=f)
 
         # read simulation output
-        data = swmmtoolbox.extract(self.output_file, ' '.join([','.join(x) for x in self.reporting_nodes]))
-        res_col_name = '_'.join(self.reporting_nodes[0])
+        data = swmmtoolbox.extract(self.output_file, ' '.join([','.join(x['swmm_node']) for x in self.obs_config]))
 
-        # only give results for time steps where evaluation data exists
-        # synced = pd.merge(
-        #     left=data, left_on=res_col_name,
-        #     right=self.observations, right_on='value',
-        #     how='inner')
-        synced = data.join(self.observations, how='inner')
-
-        # self.eval_data = list(synced['value'])
-        # self.eval_dates = list(synced.index)
-
-        return list(synced[res_col_name])
+        return data
 
     def apply_parameters(self, model_params):
         # apply simulation params to model
         params = {
-            'forcing_data_file': self.forcing_data_file,
+            'forcing_data_file': self.temp_forcing_data_file,
             'sim_start_time': datetime.strftime(self.sim_start_dt, '%H:%M:%S'),
             'sim_end_time': datetime.strftime(self.sim_end_dt, '%H:%M:%S'),
             'sim_start_date': datetime.strftime(self.sim_start_dt, '%m/%d/%Y'),

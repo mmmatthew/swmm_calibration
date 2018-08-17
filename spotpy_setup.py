@@ -22,8 +22,9 @@ class SpotpySwmmSetup(object):
     def objectivefunction(self, simulation, evaluation):
 
         # compute similarity
-        # objectivefunction = -spotpy.objectivefunctions.rmse(evaluation, simulation)
-        similarity = 4
-        return similarity
+        eval = list(evaluation[self.model.obs_config[0]['swmm_node'][1]])
+        sim = list(simulation['_'.join(self.model.obs_config[0]['swmm_node'])])
+        objectivefunction = -spotpy.objectivefunctions.rmse(eval, sim)
+        return objectivefunction
 
 
