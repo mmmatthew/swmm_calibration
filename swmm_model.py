@@ -69,7 +69,8 @@ class SwmmModel(object):
         data['datetime'] = data.index
         data['date'] = data['datetime'].apply(lambda x: x.strftime('%m/%d/%Y'))
         data['time'] = data['datetime'].apply(lambda x: x.strftime('%H:%M:%S'))
-
+        # clip data
+        data = data.loc[self.sim_start_dt : self.sim_end_dt]
         data.to_csv(self.temp_forcing_data_file,
                     sep=' ',
                     columns=['date', 'time', 'value'],
@@ -103,7 +104,9 @@ class SwmmModel(object):
         :return: the simulation of the model
         """
         model_params = {
-            's_r': model_params[0]
+            's_r': model_params[0],
+            'r_p3': model_params[1],
+            'r_px': model_params[2]
         }
         return self._run(model_params)
 
@@ -111,7 +114,7 @@ class SwmmModel(object):
 
         # Check model params
         if not self.check_parameters(model_params):
-            return self.eval_data * -10000
+            return self.observations * -10000
 
         # Apply model params to model
         self.apply_parameters(model_params)
@@ -124,7 +127,7 @@ class SwmmModel(object):
         # read simulation output
         data = swmmtoolbox.extract(self.output_file, ' '.join([','.join(x['swmm_node']) for x in self.obs_config]))
 
-        return data
+        return data.rename(index=str, columns={'_'.join(self.obs_config[0]['swmm_node']): self.obs_config[0]['swmm_node'][1]})
 
     def apply_parameters(self, model_params):
         # apply simulation params to model
@@ -134,9 +137,9 @@ class SwmmModel(object):
             'sim_end_time': datetime.strftime(self.sim_end_dt, '%H:%M:%S'),
             'sim_start_date': datetime.strftime(self.sim_start_dt, '%m/%d/%Y'),
             'sim_end_date': datetime.strftime(self.sim_end_dt, '%m/%d/%Y'),
-            'sim_report_step': str(self.sim_reporting_step),
-            's_r': model_params['s_r']
+            'sim_report_step': str(self.sim_reporting_step)
         }
+        params.update(model_params)
 
         # apply parameters to input
         input_mod = self.swmm_model_template.substitute(params)
@@ -147,13 +150,9 @@ class SwmmModel(object):
         # check that parameters are within acceptable bounds
         for param_name, value in model_params.items():
             if value < self.parameter_bounds[param_name][0] or value > self.parameter_bounds[param_name][1]:
-                print('''
-                The following combination was ignored:
-                surface roughness: {s_r} = {s_r_val}
-                ##############################
-                '''.format(
-                    s_r=param_name,
-                    s_r_val=value
+                print('## ignored: {p_name} = {p_val}'.format(
+                    p_name=param_name,
+                    p_val=value
                 ))
                 return False
         return True

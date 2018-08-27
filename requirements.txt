@@ -2,7 +2,6 @@ DateTime==4.2
 enum34==1.1.6
 numpy==1.15.0
 pandas==0.23.3
-pyswmm==0.4.8
 python-dateutil==2.7.3
 pytz==2018.5
 six==1.11.0

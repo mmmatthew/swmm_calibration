@@ -1,0 +1,245 @@
+[TITLE]
+;;Project Title/Notes
+
+[OPTIONS]
+;;Option             Value
+FLOW_UNITS           LPS
+INFILTRATION         HORTON
+FLOW_ROUTING         DYNWAVE
+LINK_OFFSETS         DEPTH
+MIN_SLOPE            0
+ALLOW_PONDING        NO
+SKIP_STEADY_STATE    NO
+
+START_DATE           $sim_start_date
+START_TIME           $sim_start_time
+REPORT_START_DATE    $sim_start_date
+REPORT_START_TIME    $sim_start_time
+END_DATE             $sim_end_date
+END_TIME             $sim_end_time
+SWEEP_START          01/01
+SWEEP_END            12/31
+DRY_DAYS             0
+REPORT_STEP          $sim_report_step
+WET_STEP             00:00:01
+DRY_STEP             00:00:01
+ROUTING_STEP         0.05
+
+INERTIAL_DAMPING     NONE
+NORMAL_FLOW_LIMITED  BOTH
+FORCE_MAIN_EQUATION  H-W
+VARIABLE_STEP        0.75
+LENGTHENING_STEP     0
+MIN_SURFAREA         1.14
+MAX_TRIALS           8
+HEAD_TOLERANCE       0.0015
+SYS_FLOW_TOL         5
+LAT_FLOW_TOL         5
+MINIMUM_STEP         0.5
+THREADS              4
+
+[EVAPORATION]
+;;Data Source    Parameters
+;;-------------- ----------------
+CONSTANT         0.0
+DRY_ONLY         NO
+
+[JUNCTIONS]
+;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded
+;;-------------- ---------- ---------- ---------- ---------- ----------
+2                417.98     0          0          10         0
+4                417.26     0.3272     0          10         0
+6                417.26     0.3272     0          10         0
+7                417.26     0.3272     0          10         0
+8                417.26     0.3272     0          10         0
+9                417.26     0.3272     0          10         0
+10               417.26     0.3272     0          10         0
+m2               417.41     2.35       0          10         0
+m1               418.34     1.6        0          10         0
+m3               417.44     1          0          10         0
+v9               417.94     0          0          10         0
+v7               417.94     0          0          10         0
+virt2            419.94     0          0          0          0
+v6               419.47     0          0          10         0
+virtual1         420.48     0          0          0          0
+virt3            419.90     0          0          10         0
+28               419.69     0          0          10         0
+29               419.68     0          0          10         0
+v8               417.94     0          0          10         0
+
+[OUTFALLS]
+;;Name           Elevation  Type       Stage Data       Gated    Route To
+;;-------------- ---------- ---------- ---------------- -------- ----------------
+5                417.78     FREE                        NO
+
+[STORAGE]
+;;Name           Elev.    MaxDepth   InitDepth  Shape      Curve Name/Params            N/A      Fevap    Psi      Ksat     IMD
+;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
+s3               419.94   1          0          TABULAR    Pond                         0        0
+House            418.44   1          0          FUNCTIONAL 0         0         43       0        0
+;Exit shaft
+s5               417.94   1.5        0          FUNCTIONAL 0         0         6.24     0        0
+s2               417.75   3          0          FUNCTIONAL 0         1         2.94     0        0
+s4               419.76   1          0          FUNCTIONAL 0         1         7.81     0        0
+
+[CONDUITS]
+;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow
+;;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------
+p7               9                m3               13         $r_px       0          0          0          0
+17               6                4                0.96       0.01       0          0          0          0
+18               8                6                1.83       $r_px       0          0          0          0
+19               9                8                0.42       0.01       0          0          0          0
+20               10               9                0.49       0.01       0          0          0          0
+22               4                7                0.7        0.01       0          0          0          0
+p4               m2               10               15.65      $r_px       0          0          0          0
+5                4                v9               1.2        0.01       0.68       0          0          0
+c2               virt2            virt3            7.3        $s_r       0          0          0          0
+27               4                2                20         0.01       0.68       0          0          0
+p8               v8               5                30         0.01       0          0          0          0
+c1               virtual1         s3               7.2        $s_r       0          0          0          0
+p3               m1               m2               8.5        $r_p3       0.8        1.68       0          0
+c3               s4               28               4.63       $s_r       0          0          0          0
+c4               28               v6               11         $r_px       0          0          0          0
+33               29               m1               1.44       0.01       0          1.34       0          0
+p6               v8               v7               2          $r_px       0          0          0          0
+
+[ORIFICES]
+;;Name           From Node        To Node          Type         Offset     Qcoeff     Gated    CloseTime
+;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- ----------
+r5               House            m3               BOTTOM       0          0.65       NO       0
+r6               s5               v9               SIDE         0          0.65       NO       0
+r4               s5               v7               SIDE         0          0.3        NO       0
+10               s4               m2               BOTTOM       0          0.65       NO       0
+r2               s3               m1               BOTTOM       0          .6         NO       0
+
+[WEIRS]
+;;Name           From Node        To Node          Type         CrestHt    Qcoeff     Gated    EndCon   EndCoeff   Surcharge  RoadWidth  RoadSurf
+;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- -------- ---------- ---------- ---------- ----------
+w1               s3               virt2            TRANSVERSE   0.45       3.33       NO       0        0          YES
+w3               v6               s5               TRANSVERSE   0          3.33       NO       0        0          YES
+w4               s2               virtual1         TRANSVERSE   0          3.33       NO       0        0          YES
+w2               virt3            s4               TRANSVERSE   0          3.33       NO       0        0          YES
+
+[OUTLETS]
+;;Name           From Node        To Node          Offset     Type            QTable/Qcoeff    Qexpon     Gated
+;;-------------- ---------------- ---------------- ---------- --------------- ---------------- ---------- --------
+r1               s3               29               0          FUNCTIONAL/DEPTH 10.0             0.5        NO
+
+[XSECTIONS]
+;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels    Culvert
+;;-------------- ------------ ---------------- ---------- ---------- ---------- ---------- ----------
+p7               CIRCULAR     0.1472           0          0          0          1
+17               CIRCULAR     0.3272           0          0          0          1
+18               CIRCULAR     0.3272           0          0          0          1
+19               CIRCULAR     0.3272           0          0          0          1
+20               CIRCULAR     0.3272           0          0          0          1
+22               CIRCULAR     0.3272           0          0          0          1
+p4               CIRCULAR     0.000001         0          0          0          1
+5                CIRCULAR     .327             0          0          0          1
+c2               RECT_OPEN    1                1          0          0          1
+27               CIRCULAR     .327             0          0          0          1
+p8               CIRCULAR     .29              0          0          0          1
+c1               RECT_OPEN    1                5.5        0          0          1
+p3               CIRCULAR     0.1762           0          0          0          1
+c3               RECT_OPEN    1                1.06       0          0          1
+c4               RECT_OPEN    1                1.5        2          0          1
+33               CIRCULAR     0.15             0          0          0          1
+p6               CIRCULAR     0.234            0          0          0          1
+r5               CIRCULAR     .6               0          0          0
+r6               CIRCULAR     .3               0          0          0
+r4               CIRCULAR     .3               0          0          0
+10               CIRCULAR     0.6              0          0          0
+r2               RECT_CLOSED  .6               .6         0          0
+w1               RECT_OPEN    1                1          0          0
+w3               RECT_OPEN    1                2.5        0          0
+w4               RECT_OPEN    1                1          0          0
+w2               RECT_OPEN    1                1          0          0
+
+[INFLOWS]
+;;Node           Constituent      Time Series      Type     Mfactor  Sfactor  Baseline Pattern
+;;-------------- ---------------- ---------------- -------- -------- -------- -------- --------
+s2               FLOW             forcingData          FLOW     1.0      1.0
+
+[CURVES]
+;;Name           Type       X-Value    Y-Value
+;;-------------- ---------- ---------- ----------
+;Pond behind dam
+Pond             Storage    0          9
+Pond                        .9         61.81
+
+[TIMESERIES]
+;;Name           Date       Time       Value
+;;-------------- ---------- ---------- ----------
+forcingData      FILE "$forcing_data_file"
+
+[REPORT]
+;;Reporting Options
+INPUT      NO
+CONTROLS   NO
+SUBCATCHMENTS ALL
+NODES ALL
+LINKS ALL
+
+[TAGS]
+Link       p7               Diam=0.1472
+Link       p4               D=0.184
+
+[MAP]
+DIMENSIONS 618596.772 231480.893 618629.306 231507.544
+Units      Meters
+
+[COORDINATES]
+;;Node           X-Coord            Y-Coord
+;;-------------- ------------------ ------------------
+2                618600.868         231485.926
+4                618612.515         231502.331
+6                618612.027         231501.497
+7                618612.828         231502.963
+8                618611.073         231499.871
+9                618610.847         231499.503
+10               618610.588         231499.088
+m2               618619.482         231489.914
+m1               618613.230         231485.238
+m3               618622.642         231493.595
+v9               618613.570         231501.840
+v7               618614.131         231503.178
+virt2            618612.833         231486.547
+v6               618613.644         231500.431
+virtual1         618608.033         231484.662
+virt3            618616.455         231488.609
+28               618610.978         231492.437
+29               618611.743         231484.103
+v8               618612.214         231504.157
+5                618584.420         231504.676
+s3               618610.917         231485.016
+House            618623.378         231495.780
+s5               618615.326         231501.435
+s2               618606.855         231484.692
+s4               618617.662         231489.345
+
+[VERTICES]
+;;Link           X-Coord            Y-Coord
+;;-------------- ------------------ ------------------
+p4               618608.422         231495.498
+27               618612.085         231502.525
+27               618611.157         231502.374
+p8               618611.971         231504.227
+p3               618615.159         231485.428
+p3               618616.632         231484.515
+c4               618610.035         231492.908
+c4               618609.623         231493.703
+c4               618609.446         231495.441
+c4               618610.919         231498.120
+w2               618617.662         231489.227
+r1               618611.272         231484.015
+
+
+[PROFILES]
+;;Name           Links
+;;-------------- ----------
+"enter-overland-house" w4 c1 r2 p3 c3
+"enter-overland-house" c4 11 6 5 17
+"enter-overland-house" 18 19 13 3
+"route1          " w4 c1 r2 p3 10
+"route1          " c3 c4 11 6 5
+"route1          " 17 18 19 13 3
