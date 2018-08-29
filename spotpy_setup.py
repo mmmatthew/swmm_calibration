@@ -22,9 +22,11 @@ class SpotpySwmmSetup(object):
     def objectivefunction(self, simulation, evaluation, params=None):
 
         # compute similarity
-        eval = list(evaluation[self.model.obs_config[0]['swmm_node'][1]])
-        sim = list(simulation[self.model.obs_config[0]['swmm_node'][1]])
-        objectivefunction = spotpy.objectivefunctions.rmse(eval, sim)
-        return objectivefunction
+        objfun = []
+        for obs in self.model.obs_config:
+            evalu = list(evaluation[obs['swmm_node'][1]])
+            sim = list(simulation[obs['swmm_node'][1]])
+            objfun.append(spotpy.objectivefunctions.rsquared(evalu, sim))
+        return -sum(objfun)
 
 

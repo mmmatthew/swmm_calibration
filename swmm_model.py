@@ -95,7 +95,7 @@ class SwmmModel(object):
             if self.observations is None:
                 self.observations = obs_data.rename(index=str, columns={'value': obs['swmm_node'][1]})
             else:
-                self.observations[obs['swmm_node'][1]] = obs_data
+                self.observations[obs['swmm_node'][1]] = obs_data['value']
 
     def run(self, *model_params):
         """
@@ -106,7 +106,10 @@ class SwmmModel(object):
         model_params = {
             's_r': model_params[0],
             'r_p3': model_params[1],
-            'r_px': model_params[2]
+            'r_p7': model_params[2],
+            'r_px': model_params[3],
+            'c_m1': model_params[4],
+            'c_w1': model_params[5],
         }
         return self._run(model_params)
 
@@ -125,9 +128,12 @@ class SwmmModel(object):
                             stdout=f)
 
         # read simulation output
-        data = swmmtoolbox.extract(self.output_file, ' '.join([','.join(x['swmm_node']) for x in self.obs_config]))
+        data = swmmtoolbox.extract(self.output_file, *[','.join(x['swmm_node']) for x in self.obs_config])
 
-        return data.rename(index=str, columns={'_'.join(self.obs_config[0]['swmm_node']): self.obs_config[0]['swmm_node'][1]})
+        # renaming rules
+        rename_dict = dict(('_'.join(o['swmm_node']), o['swmm_node'][1]) for o in self.obs_config)
+
+        return data.rename(index=str, columns=rename_dict)
 
     def apply_parameters(self, model_params):
         # apply simulation params to model

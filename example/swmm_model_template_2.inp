@@ -85,7 +85,7 @@ s4               419.76   1          0          FUNCTIONAL 0         1         7
 [CONDUITS]
 ;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow
 ;;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------
-p7               9                m3               13         $r_px       0          0          0          0
+p7               9                m3               13         $r_p7       0          0          0          0
 17               6                4                0.96       0.01       0          0          0          0
 18               8                6                1.83       $r_px       0          0          0          0
 19               9                8                0.42       0.01       0          0          0          0
@@ -110,12 +110,12 @@ r5               House            m3               BOTTOM       0          0.65 
 r6               s5               v9               SIDE         0          0.65       NO       0
 r4               s5               v7               SIDE         0          0.3        NO       0
 10               s4               m2               BOTTOM       0          0.65       NO       0
-r2               s3               m1               BOTTOM       0          .6         NO       0
+r2               s3               m1               BOTTOM       0          $c_m1         NO       0
 
 [WEIRS]
 ;;Name           From Node        To Node          Type         CrestHt    Qcoeff     Gated    EndCon   EndCoeff   Surcharge  RoadWidth  RoadSurf
 ;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- -------- ---------- ---------- ---------- ----------
-w1               s3               virt2            TRANSVERSE   0.45       3.33       NO       0        0          YES
+w1               s3               virt2            TRANSVERSE   0.45       $c_w1       NO       0        0          YES
 w3               v6               s5               TRANSVERSE   0          3.33       NO       0        0          YES
 w4               s2               virtual1         TRANSVERSE   0          3.33       NO       0        0          YES
 w2               virt3            s4               TRANSVERSE   0          3.33       NO       0        0          YES
@@ -123,7 +123,7 @@ w2               virt3            s4               TRANSVERSE   0          3.33 
 [OUTLETS]
 ;;Name           From Node        To Node          Offset     Type            QTable/Qcoeff    Qexpon     Gated
 ;;-------------- ---------------- ---------------- ---------- --------------- ---------------- ---------- --------
-r1               s3               29               0          FUNCTIONAL/DEPTH 10.0             0.5        NO
+r1               s3               29               0          FUNCTIONAL/DEPTH 10.0             0.5        YES
 
 [XSECTIONS]
 ;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels    Culvert

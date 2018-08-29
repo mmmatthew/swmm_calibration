@@ -11,19 +11,25 @@ from spotpy_setup import SpotpySwmmSetup
 model = swmm_model.SwmmModel(
     swmm_model_template='swmm_model_template_2.inp',
     sim_start_dt=datetime.strptime('2016/10/06 14:06:25', '%Y/%m/%d %H:%M:%S'),  # start every 5 sec. (00:00:03 is bad)
-    sim_end_dt=datetime.strptime('2016/10/06 14:30:00', '%Y/%m/%d %H:%M:%S'),
+    sim_end_dt=datetime.strptime('2016/10/06 14:21:00', '%Y/%m/%d %H:%M:%S'),
     sim_reporting_step=timedelta(seconds=5),
     forcing_data_file='all_p1_q_mid_endress_logi.txt',  # "C:/coding/swmm_calibration/example/forcing_data.txt",
     obs_config=[
         {
             "data_file": 'all_s6_h_us_maxbotix.txt',
             "swmm_node": ['node', 'House', 'Depth_above_invert']
+        }, {
+            "data_file": 'all_s5_h_us_maxbotix_2.txt',
+            "swmm_node": ['node', 's5', 'Depth_above_invert'],
         }
     ],
     parameter_bounds={
         's_r': [0.0, 1.0],
         'r_p3': [0.0, 1.0],
-        'r_px': [0, 1]
+        'r_p7': [0.0, 1.0],
+        'r_px': [0, 1],
+        'c_m1': [0, 1],
+        'c_w1': [0, 5]
     }
 )
 model_params = [
@@ -31,17 +37,15 @@ model_params = [
     # spotpy.parameter.Normal('r_p3', 1.5, 0.1)  # Pipe p3 roughness
     spotpy.parameter.Uniform('s_r', 0.005, 0.05),  # Surface roughness
     spotpy.parameter.Uniform('r_p3', 0.005, 0.05),  # Pipe p3 roughness
-    spotpy.parameter.Uniform('r_px', 0.005, 0.05)  # Pipe p3 roughness
+    spotpy.parameter.Uniform('r_p7', 0.005, 0.05),  # Pipe p7 roughness
+    spotpy.parameter.Uniform('r_px', 0.005, 0.05),  # all other Pipe roughness
+    spotpy.parameter.Uniform('c_m1', 0, 1),  # sewer inlet discharge coefficient into manhole m1
+    spotpy.parameter.Uniform('c_w1', 0, 5)  # weir discharge coefficient
 ]
 
 # run calibration
 spotpy_setup = SpotpySwmmSetup(model, model_params)
 # do not save the simulation because simulation results are data frames and do not support saving at this point
-sampler = spotpy.algorithms.sceua(spotpy_setup, dbname='SCEUA_SWMM', dbformat='csv', alt_objfun='', save_sim=False)
+sampler = spotpy.algorithms.sceua(spotpy_setup, dbname='SCE-UA', dbformat='csv', alt_objfun='', save_sim=False)
 sampler.sample(1)
 results = sampler.getdata()
-
-evaluation = spotpy_setup.evaluation()
-evaldates = spotpy_setup.evaluation(evaldates=True)
-
-spotpy.analyser.plot_bestmodelruns(results, evaluation, dates=evaldates, ylabel='Water head')
