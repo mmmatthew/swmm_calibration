@@ -16,10 +16,10 @@ model = swmm_model.SwmmModel(
     forcing_data_file='all_p1_q_mid_endress_logi.txt',  # "C:/coding/swmm_calibration/example/forcing_data.txt",
     obs_config=[
         {
-            "data_file": 'all_s6_h_us_maxbotix.txt',
+            "data_file": 'data/all_s6_h_us_maxbotix.txt',
             "swmm_node": ['node', 'House', 'Depth_above_invert']
         }, {
-            "data_file": 'all_s5_h_us_maxbotix_2.txt',
+            "data_file": 'data/all_s5_h_us_maxbotix_2.txt',
             "swmm_node": ['node', 's5', 'Depth_above_invert'],
         }
     ],
@@ -29,23 +29,23 @@ model = swmm_model.SwmmModel(
         'r_p7': [0.0, 1.0],
         'r_px': [0, 1],
         'c_m1': [0, 1],
-        'c_w1': [0, 5]
+        'c_w1': [0, 10]
     }
 )
 model_params = [
     # spotpy.parameter.Gamma('s_r', 1.5, 0.1),  # Surface roughness
     # spotpy.parameter.Normal('r_p3', 1.5, 0.1)  # Pipe p3 roughness
     spotpy.parameter.Uniform('s_r', 0.005, 0.05),  # Surface roughness
-    spotpy.parameter.Uniform('r_p3', 0.005, 0.05),  # Pipe p3 roughness
+    spotpy.parameter.Uniform('r_p3', 0.005, 0.5),  # Pipe p3 roughness
     spotpy.parameter.Uniform('r_p7', 0.005, 0.05),  # Pipe p7 roughness
     spotpy.parameter.Uniform('r_px', 0.005, 0.05),  # all other Pipe roughness
     spotpy.parameter.Uniform('c_m1', 0, 1),  # sewer inlet discharge coefficient into manhole m1
-    spotpy.parameter.Uniform('c_w1', 0, 5)  # weir discharge coefficient
+    spotpy.parameter.Uniform('c_w1', 0, 10)  # weir discharge coefficient
 ]
 
 # run calibration
 spotpy_setup = SpotpySwmmSetup(model, model_params)
 # do not save the simulation because simulation results are data frames and do not support saving at this point
 sampler = spotpy.algorithms.sceua(spotpy_setup, dbname='SCE-UA', dbformat='csv', alt_objfun='', save_sim=False)
-sampler.sample(1)
+sampler.sample(1000)
 results = sampler.getdata()
