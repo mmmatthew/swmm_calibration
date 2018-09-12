@@ -26,7 +26,7 @@ class SpotpySwmmSetup(object):
         for obs in self.model.obs_config:
             evalu = list(evaluation[obs['swmm_node'][1]])
             sim = list(simulation[obs['swmm_node'][1]])
-            objfun.append(spotpy.objectivefunctions.rsquared(evalu, sim))
+            objfun.append(spotpy.objectivefunctions.nashsutcliffe(evalu, sim))
         return -sum(objfun)
 
 

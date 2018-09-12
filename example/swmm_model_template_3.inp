@@ -106,7 +106,7 @@ r1               s3               29               BOTTOM       0          $c_m1
 [WEIRS]
 ;;Name           From Node        To Node          Type         CrestHt    Qcoeff     Gated    EndCon   EndCoeff   Surcharge  RoadWidth  RoadSurf
 ;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- -------- ---------- ---------- ---------- ----------
-w1               s3               virt2            TRANSVERSE   0.51       $c_w1      NO       0        0          YES
+w1               s3               virt2            TRANSVERSE   0.45       $c_w1      NO       0        0          YES
 w3               v6               s5               TRANSVERSE   0          3.33       NO       0        0          YES
 w4               s2               virtual1         TRANSVERSE   2.73       3.33       NO       0        0          YES
 w2               virt3            s4               TRANSVERSE   0          3.33       NO       0        0          YES

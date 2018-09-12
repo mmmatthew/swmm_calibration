@@ -39,7 +39,7 @@ def plot_chain(database_file):
 
 # plot parameter distributions
 def plot_density(database_file, burn_in=0.75):
-    sns.set(style="dark")
+    sns.set(style="ticks")
 
     # read data
     data = pd.read_csv(database_file, sep=',')
@@ -91,6 +91,6 @@ def plot_density(database_file, burn_in=0.75):
 
     g = sns.PairGrid(data, vars=vars, diag_sharey=False)
     g.map_lower(sns.kdeplot)
-    g.map_upper(sns.scatterplot, size=1)
+    g.map_upper(sns.scatterplot, size=1, alpha=0.2, linewidth=0)
     g.map_diag(sns.kdeplot)
     g.savefig("parameter kernel 2")

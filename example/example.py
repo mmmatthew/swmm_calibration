@@ -10,8 +10,8 @@ from spotpy_setup import SpotpySwmmSetup
 # Simulation parameters
 model = swmm_model.SwmmModel(
     swmm_model_template='swmm_model_template_3.inp',
-    sim_start_dt=datetime.strptime('2016/10/06 14:06:25', '%Y/%m/%d %H:%M:%S'),  # start every 5 sec. (00:00:03 is bad)
-    sim_end_dt=datetime.strptime('2016/10/06 14:21:00', '%Y/%m/%d %H:%M:%S'),
+    sim_start_dt=datetime.strptime('2016/10/07 12:44:30', '%Y/%m/%d %H:%M:%S'),  # start every 5 sec. (00:00:03 is bad)
+    sim_end_dt=datetime.strptime('2016/10/07 13:03:20', '%Y/%m/%d %H:%M:%S'),
     sim_reporting_step=timedelta(seconds=5),
     forcing_data_file='data/all_p1_q_mid_endress_logi.txt',  # "C:/coding/swmm_calibration/example/forcing_data.txt",
     obs_config=[
@@ -50,5 +50,5 @@ model_params = [
 spotpy_setup = SpotpySwmmSetup(model, model_params)
 # do not save the simulation because simulation results are data frames and do not support saving at this point
 sampler = spotpy.algorithms.sceua(spotpy_setup, dbname='SCE-UA', dbformat='csv', alt_objfun='', save_sim=False)
-sampler.sample(1000)
+sampler.sample(1500, ngs=6, pcento=0.01)
 results = sampler.getdata()
