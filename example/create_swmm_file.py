@@ -9,12 +9,12 @@ sim_end_dt = datetime.strptime('2016/10/06 14:21:00', '%Y/%m/%d %H:%M:%S')
 sim_reporting_step = timedelta(seconds=5)
 
 model_params = {
-    's_r': 0.017,
-    'r_p3': 0.32,
-    'r_p7': 0.04,
-    'r_px': 0.021,
-    'c_m1': 0.4,
-    'c_w1': 7.5,
+    's_r': 0.011,
+    'r_p3': 0.04,
+    'r_p7': 0.01,
+    'r_px': 0.009,
+    'c_m1': 0.9,
+    'c_w1': 9.3,
 }
 
 # apply simulation params to model

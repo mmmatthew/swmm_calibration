@@ -1,0 +1,229 @@
+[TITLE]
+;;Project Title/Notes
+
+[OPTIONS]
+;;Option             Value
+FLOW_UNITS           LPS
+INFILTRATION         HORTON
+FLOW_ROUTING         DYNWAVE
+LINK_OFFSETS         DEPTH
+MIN_SLOPE            0
+ALLOW_PONDING        NO
+SKIP_STEADY_STATE    NO
+
+START_DATE           $sim_start_date
+START_TIME           $sim_start_time
+REPORT_START_DATE    $sim_start_date
+REPORT_START_TIME    $sim_start_time
+END_DATE             $sim_end_date
+END_TIME             $sim_end_time
+SWEEP_START          01/01
+SWEEP_END            12/31
+DRY_DAYS             0
+REPORT_STEP          $sim_report_step
+WET_STEP             00:00:01
+DRY_STEP             00:00:01
+ROUTING_STEP         0.05
+
+INERTIAL_DAMPING     NONE
+NORMAL_FLOW_LIMITED  BOTH
+FORCE_MAIN_EQUATION  H-W
+VARIABLE_STEP        0.75
+LENGTHENING_STEP     0
+MIN_SURFAREA         1.14
+MAX_TRIALS           8
+HEAD_TOLERANCE       0.0015
+SYS_FLOW_TOL         5
+LAT_FLOW_TOL         5
+MINIMUM_STEP         0.5
+THREADS              4
+
+[EVAPORATION]
+;;Data Source    Parameters
+;;-------------- ----------------
+CONSTANT         0.0
+DRY_ONLY         NO
+
+[JUNCTIONS]
+;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded
+;;-------------- ---------- ---------- ---------- ---------- ----------
+4                417.26     0.3272     0.6        10         0
+9                417.26     0.3272     .6         10         0
+v9               417.94     0          0          10         0
+;Kv = 6800 m3/h
+v7               417.94     0          0          10         0
+virt2            419.94     0          0          0          0
+v6               419.47     0          0          10         0
+virtual1         420.48     0          0          0          0
+virt3            419.90     0          0          10         0
+28               419.69     0          0          10         0
+29               419.68     0          0          10         0
+v4               417.94     0          0          10         0
+
+[OUTFALLS]
+;;Name           Elevation  Type       Stage Data       Gated    Route To
+;;-------------- ---------- ---------- ---------------- -------- ----------------
+5                417.78     FREE                        NO
+
+[STORAGE]
+;;Name           Elev.    MaxDepth   InitDepth  Shape      Curve Name/Params            N/A      Fevap    Psi      Ksat     IMD
+;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
+s3               419.94   1          0          TABULAR    storage_s3                   0        0
+s6               418.44   1          0          TABULAR    storage_s6                   0        0
+;Exit shaft
+s5               417.94   1.5        0          TABULAR    storage_s5                   0        0
+s2               417.75   3          2.7        FUNCTIONAL 0         1         2.94     0        0
+s4               419.76   1          0          FUNCTIONAL 0         1         6.81     0        0
+m1               418.34   2.6        0.8        FUNCTIONAL 0         0         1.13     0        0
+m2               417.41   3.35       .553       FUNCTIONAL 0         0         2        0        0
+m3               417.44   2          0.4        FUNCTIONAL 0         0         1.13     0        0
+
+[CONDUITS]
+;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow
+;;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------
+p7               9                m3               13         $r_p7      0          0          0          0
+p5_b             4                9                3.23       $r_px      0          0          0          0
+p5               4                v9               1.2        $r_px      0.68       0          0          0
+c2               virt2            virt3            7.3        $s_r       0          0          0          0
+p8               v4               5                30         $r_px      0          0          0          0
+c1               virtual1         s3               6.3        $s_r       0          0          0          0
+p3               m1               m2               8.5        $r_p3      0.8        1.68       0          0
+c3               s4               28               4.63       0.001      0          0          0          0
+c4               28               v6               11         0.004      0          0          0          0
+p2               29               m1               1.44       $r_px      0          1.34       0          0
+p6               v4               v7               2.35       $r_px      0          0          0          0
+
+[ORIFICES]
+;;Name           From Node        To Node          Type         Offset     Qcoeff     Gated    CloseTime
+;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- ----------
+r5               s6               m3               BOTTOM       0          0.65       NO       0
+r6               s5               v9               SIDE         0          0.65       NO       0
+r4               s5               v7               SIDE         0          0.6        NO       0
+r3               s4               m2               BOTTOM       0          0.65       NO       0
+r2               s3               m1               BOTTOM       0          $c_m1      NO       0
+r1               s3               29               BOTTOM       0          $c_m1      NO       0
+
+[WEIRS]
+;;Name           From Node        To Node          Type         CrestHt    Qcoeff     Gated    EndCon   EndCoeff   Surcharge  RoadWidth  RoadSurf
+;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- -------- ---------- ---------- ---------- ----------
+w1               s3               virt2            TRANSVERSE   0.51       $c_w1      NO       0        0          YES
+w3               v6               s5               TRANSVERSE   0          3.33       NO       0        0          YES
+w4               s2               virtual1         TRANSVERSE   2.73       3.33       NO       0        0          YES
+w2               virt3            s4               TRANSVERSE   0          3.33       NO       0        0          YES
+
+[XSECTIONS]
+;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels    Culvert
+;;-------------- ------------ ---------------- ---------- ---------- ---------- ---------- ----------
+p7               CIRCULAR     0.1472           0          0          0          1
+p5_b             CIRCULAR     0.3272           0          0          0          1
+p5               CIRCULAR     .327             0          0          0          1
+c2               RECT_OPEN    1                1          0          0          1
+p8               CIRCULAR     .29              0          0          0          1
+c1               RECT_OPEN    1                5.5        0          0          1
+p3               CIRCULAR     0.1762           0          0          0          1
+c3               RECT_OPEN    1                1.06       0          0          1
+c4               RECT_OPEN    1                1.5        2          0          1
+p2               CIRCULAR     0.15             0          0          0          1
+p6               CIRCULAR     0.234            0          0          0          1
+r5               CIRCULAR     .6               0          0          0
+r6               CIRCULAR     0.234            0          0          0
+r4               CIRCULAR     0.234            0          0          0
+r3               CIRCULAR     0.6              0          0          0
+r2               RECT_CLOSED  .6               .6         0          0
+r1               RECT_CLOSED  0.2              2          0          0
+w1               RECT_OPEN    1                0.78       0          0
+w3               RECT_OPEN    1                2.5        0          0
+w4               RECT_OPEN    1                3.64       0          0
+w2               RECT_OPEN    1                1          0          0
+
+[INFLOWS]
+;;Node           Constituent      Time Series      Type     Mfactor  Sfactor  Baseline Pattern
+;;-------------- ---------------- ---------------- -------- -------- -------- -------- --------
+s2               FLOW             forcingData      FLOW     1.0      1.0
+
+[CURVES]
+;;Name           Type       X-Value    Y-Value
+;;-------------- ---------- ---------- ----------
+;Pond behind dam
+Pond             Storage    0          14.4
+Pond                        0.41       27.72
+Pond                        0.9        40.29
+;
+storage_s5       Storage    0          5.55
+storage_s5                  0.12       5.205
+storage_s5                  0.234      5.55
+storage_s5                  0.47       6.225
+;
+storage_s3       Storage    0          1
+storage_s3                  0.08       9.2
+storage_s3                  0.26       12.84
+;
+storage_s6       Storage    0          0
+storage_s6                  0.03       43.26
+
+[TIMESERIES]
+;;Name           Date       Time       Value
+;;-------------- ---------- ---------- ----------
+forcingData      FILE "$forcing_data_file"
+
+[REPORT]
+;;Reporting Options
+INPUT      NO
+CONTROLS   NO
+SUBCATCHMENTS ALL
+NODES ALL
+LINKS ALL
+
+[TAGS]
+Link       p7               Diam=0.1472
+
+[MAP]
+DIMENSIONS 618596.772 231480.893 618629.306 231507.544
+Units      Meters
+
+[COORDINATES]
+;;Node           X-Coord            Y-Coord
+;;-------------- ------------------ ------------------
+4                618612.515         231502.331
+9                618610.847         231499.503
+v9               618613.570         231501.840
+v7               618614.131         231503.178
+virt2            618612.833         231486.547
+v6               618613.644         231500.431
+virtual1         618608.033         231484.662
+virt3            618616.455         231488.609
+28               618610.978         231492.437
+29               618611.743         231484.103
+v4               618612.214         231504.157
+5                618584.420         231504.676
+s3               618610.917         231485.016
+s6               618623.378         231495.780
+s5               618615.326         231501.435
+s2               618606.855         231484.692
+s4               618617.662         231489.345
+m1               618612.826         231485.178
+m2               618619.664         231490.314
+m3               618623.007         231493.504
+
+[VERTICES]
+;;Link           X-Coord            Y-Coord
+;;-------------- ------------------ ------------------
+p8               618611.971         231504.227
+p3               618615.159         231485.428
+p3               618616.632         231484.515
+c4               618610.035         231492.908
+c4               618609.623         231493.703
+c4               618609.446         231495.441
+c4               618610.919         231498.120
+w2               618617.662         231489.227
+
+
+[PROFILES]
+;;Name           Links     
+;;-------------- ----------
+"enter-overland-house" w4 c1 r2 p3 c3
+"enter-overland-house" c4 11 6 5 17
+"enter-overland-house" 18 19 13 3
+"route1          " w4 c1 r2 p3 10
+"route1          " c3 c4 11 6 5
+"route1          " 17 18 19 13 3

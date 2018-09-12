@@ -80,10 +80,17 @@ def plot_density(database_file, burn_in=0.75):
             "name": 'Capacity weir w1'
         }
     ]
-    for ax, p in zip(axes.flat, params):
-        sns.distplot(data[p['code']], hist=False, rug=True, color="r", ax=ax, axlabel=p['name'])
+    # for ax, p in zip(axes.flat, params):
+    #     sns.distplot(data[p['code']], hist=False, rug=True, color="r", ax=ax, axlabel=p['name'])
+    # f.tight_layout()
+    # f.show()
+    #
+    # f.savefig("parameter kernel")
 
-    f.tight_layout()
-    f.show()
+    vars = list(map(lambda p: p['code'], params))
 
-    f.savefig("parameter kernel")
+    g = sns.PairGrid(data, vars=vars, diag_sharey=False)
+    g.map_lower(sns.kdeplot)
+    g.map_upper(sns.scatterplot, size=1)
+    g.map_diag(sns.kdeplot)
+    g.savefig("parameter kernel 2")
