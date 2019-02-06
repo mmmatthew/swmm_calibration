@@ -18,6 +18,7 @@ def read_floodx_file(evaluation_data_file):
         dayfirst=True,
         sep=';')
 
+
 def resample_interpolate(data, period):
     # aggregate per second, interpolate
     data = data.resample(period)
@@ -38,7 +39,8 @@ class SwmmModel(object):
                  cal_params, temp_folder,
                  sim_reporting_step=timedelta(seconds=5)):
         """
-        Initialized model instance with forcing data (inflow to experiment site) and evaluation data (water level in basement of house)
+        Initialized model instance with forcing data (inflow to experiment site)
+        and evaluation data (water level in basement of house)
         - swmm_model_template: path to swmm template file
         - sim_start_dt: datetime at which to start simulation e.g. datetime(2016,10,6,14,10)
         - sim_end_dt: datetime at which to start simulation e.g. datetime(2016,10,6,14,10)
@@ -68,7 +70,6 @@ class SwmmModel(object):
         # Read forcing data and reformat
         self.read_forcing(forcing_data_file)
 
-
     def read_forcing(self, forcing_data_file):
         data = read_floodx_file(forcing_data_file)
         data = resample_interpolate(data, 'S')
@@ -76,7 +77,7 @@ class SwmmModel(object):
         data['date'] = data['datetime'].apply(lambda x: x.strftime('%m/%d/%Y'))
         data['time'] = data['datetime'].apply(lambda x: x.strftime('%H:%M:%S'))
         # clip data
-        data = data.loc[self.sim_start_dt : self.sim_end_dt]
+        data = data.loc[self.sim_start_dt: self.sim_end_dt]
         data.to_csv(self.temp_forcing_data_file,
                     sep=' ',
                     columns=['date', 'time', 'value'],

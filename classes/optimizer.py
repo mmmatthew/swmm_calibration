@@ -50,6 +50,5 @@ class Optimizer(object):
 		"""plots scatter and time series of calibration run
 
 		"""
-
-		plot_chain(self)
-		plot_density(self)
+		plot_chain(self.database_path, self.temp_folder)
+		plot_density(self.database_path, self.temp_folder, self.cal_params)
