@@ -104,17 +104,21 @@ class SwmmModel(object):
             else:
                 self.observations[obs['swmm_node'][1]] = obs_data['value']
 
-    def run(self, *params):
+    def run(self, *params, named_model_params=None):
         """
         Runs the SWMM model with specific parameters. The following parameters can be passed.
+        :param model_params: dictionary of named model parameters. Replaces unnamed params
         :param multiple unnamed params: 1st: surface roughness
         :return: the simulation of the model
         """
 
-        # change how parameters are stored in order to feed to swmm model
+        # if only unnamed params are given, change how parameters are stored in order to feed to swmm model
         model_params = {}
-        for key, value in self.cal_params.items():
-            model_params[key] = params[value['rank']]
+        if named_model_params is None:
+            for key, value in self.cal_params.items():
+                model_params[key] = params[value['rank']]
+        else:
+            model_params = named_model_params
 
         # Check model params
         if not self.check_parameters(model_params):

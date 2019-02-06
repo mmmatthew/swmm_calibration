@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from os.path import join
 
 import spotpy
@@ -52,3 +53,18 @@ class Optimizer(object):
 		"""
 		plot_chain(self.database_path, self.temp_folder)
 		plot_density(self.database_path, self.temp_folder, self.cal_params)
+
+	def getOptimalParams(self):
+		"""Returns optimal parameters as found
+
+		:return:
+		"""
+		# Load calibration chain and find optimal for like1
+		cal_data = pd.read_csv(self.database_path, sep=',')
+		params = cal_data.ix[cal_data['like1'].idxmax()].to_dict()
+		# reformat parameters to match original naming
+		params_reformatted = {}
+		for k, p in self.cal_params.items():
+			params_reformatted[k] = params['par'+k]
+
+		return params_reformatted
