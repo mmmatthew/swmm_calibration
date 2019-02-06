@@ -2,13 +2,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 from os.path import join
-import numpy as np
 
-# plot optimization chain results
-def plot_chain(temp_folder, database_path):
+# self is an optimizer as defined in optimizer.py
+
+
+def plot_chain(self):
     sns.set(style="ticks")
 
-    data = pd.read_csv(database_path, sep=',')
+    data = pd.read_csv(self.database_path, sep=',')
 
     data['iteration'] = data.index
 
@@ -35,15 +36,15 @@ def plot_chain(temp_folder, database_path):
     # sns_plot.axes[5, 0].set_ylim(0, 1)
     # sns_plot.axes[6, 0].set_ylim(0, 5)
 
-    sns_plot.savefig(join(temp_folder, "calibration_chain.png"))
+    sns_plot.savefig(join(self.temp_folder, "calibration_chain.png"))
 
 
 # plot parameter distributions
-def plot_density(temp_folder, database_path, burn_in=0.75):
+def plot_density(self, burn_in=0.75):
     sns.set(style="dark")
 
     # read data
-    data = pd.read_csv(database_path, sep=',')
+    data = pd.read_csv(self.database_path, sep=',')
     data['iteration'] = data.index
     # remove burn-in
     data = data.iloc[int(data.shape[0]*burn_in):]
@@ -52,7 +53,6 @@ def plot_density(temp_folder, database_path, burn_in=0.75):
 
     # Set up the matplotlib figure
     f, axes = plt.subplots(3, 2, figsize=(9, 6), sharex=False)
-
 
     # parameters
     params = [
@@ -88,10 +88,10 @@ def plot_density(temp_folder, database_path, burn_in=0.75):
     #
     # f.savefig("parameter kernel")
 
-    vars = list(map(lambda p: p['code'], params))
+    variables = list(self.cal_params.keys())
 
-    g = sns.PairGrid(data, vars=vars, diag_sharey=False)
+    g = sns.PairGrid(data, vars=variables, diag_sharey=False)
     g.map_lower(sns.kdeplot)
     g.map_upper(sns.scatterplot, size=1)
     g.map_diag(sns.kdeplot)
-    g.savefig(join(temp_folder, "parameter kernel 2"))
+    g.savefig(join(self.temp_folder, "parameter_sampling_distributions.png"))

@@ -4,6 +4,7 @@ from os.path import join
 import spotpy
 from classes.swmm_model import SwmmModel
 from classes.spotpy_setup import SpotpySwmmSetup
+from classes.optimizer_plotting_utils import plot_chain, plot_density
 
 
 class Optimizer(object):
@@ -25,6 +26,7 @@ class Optimizer(object):
 		self.temp_folder = temp_folder
 		self.database_path = join(temp_folder, 'SCE-UA.csv')
 		# set up spotpy calibrator
+		self.cal_params = cal_params
 		self.spotpy_setup = SpotpySwmmSetup(model, cal_params, obj_fun)
 		# do not save the simulation because simulation results are data frames
 		# and do not support saving at this point
@@ -48,7 +50,6 @@ class Optimizer(object):
 		"""plots scatter and time series of calibration run
 
 		"""
-		from helpers.plotting_utils import plot_chain, plot_density
 
-		plot_chain(self.temp_folder, self.database_path)
-		plot_density(self.temp_folder, self.database_path)
+		plot_chain(self)
+		plot_density(self)

@@ -57,8 +57,6 @@ class SwmmModel(object):
         self.obs_config = obs_config
 
         # define where temporary results should be saved
-        if not os.path.exists(temp_folder):
-            os.mkdir(temp_folder)
         self.temp_model = join(temp_folder, 'model.inp')
         self.output_file = join(temp_folder, 'output.out')
         self.report_file = join(temp_folder, 'report.rpt')
