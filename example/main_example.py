@@ -8,7 +8,7 @@ from datetime import datetime
 
 import example.settings as s
 
-action = 'get_optimal'
+action = 'calibrate'
 
 # get temporary directory for saving working files. By default define a new one
 nowstring = datetime.strftime(datetime.now(), '%Y%m%d_%H.%M')

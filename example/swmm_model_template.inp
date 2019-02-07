@@ -221,9 +221,3 @@ w2               618617.662         231489.227
 [PROFILES]
 ;;Name           Links     
 ;;-------------- ----------
-"enter-overland-house" w4 c1 r2 p3 c3
-"enter-overland-house" c4 11 6 5 17
-"enter-overland-house" 18 19 13 3
-"route1          " w4 c1 r2 p3 10
-"route1          " c3 c4 11 6 5
-"route1          " 17 18 19 13 3

@@ -107,7 +107,7 @@ class SwmmModel(object):
     def run(self, *params, named_model_params=None):
         """
         Runs the SWMM model with specific parameters. The following parameters can be passed.
-        :param model_params: dictionary of named model parameters. Replaces unnamed params
+        :param named_model_params: dictionary of named model parameters. Replaces unnamed params
         :param multiple unnamed params: 1st: surface roughness
         :return: the simulation of the model
         """
