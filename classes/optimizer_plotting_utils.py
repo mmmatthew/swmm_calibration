@@ -28,6 +28,7 @@ def plot_chain(database_path, temp_folder):
                 kind="line", legend="full", data=data_reshaped)
 
     sns_plot.savefig(join(temp_folder, "calibration_chain.png"))
+    plt.clf()
 
 
 # plot parameter distributions
@@ -49,3 +50,4 @@ def plot_density(database_path, temp_folder, cal_params, uselast: int=200):
     g.map_upper(sns.scatterplot, size=1)
     g.map_diag(sns.kdeplot)
     g.savefig(join(temp_folder, "parameter_sampling_distributions.png"))
+    plt.clf()

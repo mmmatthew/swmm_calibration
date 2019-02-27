@@ -13,10 +13,11 @@ class Optimizer(object):
 
 	"""
 
-	def __init__(self, model: SwmmModel, cal_params, obj_fun, temp_folder):
+	def __init__(self, model: SwmmModel, algorithm, cal_params, obj_fun, temp_folder):
 		"""
 		creates an optimizer that is ready to optimize
 		:param model: initialized SwmmModel
+		:param algorithm: optimization algorithm used
 		:param cal_params: definition of calibration parameters including ranges
 		:param obj_fun: objective function to be used for calibration
 		:param stopping_criteria:  stopping criteria
@@ -25,13 +26,13 @@ class Optimizer(object):
 
 		# where to store optimization results
 		self.temp_folder = temp_folder
-		self.database_path = join(temp_folder, 'SCE-UA.csv')
+		self.database_path = join(temp_folder, 'iterations.csv')
 		# set up spotpy calibrator
 		self.cal_params = cal_params
 		self.spotpy_setup = SpotpySwmmSetup(model, cal_params, obj_fun)
 		# do not save the simulation because simulation results are data frames
 		# and do not support saving at this point
-		self.sampler = spotpy.algorithms.sceua(
+		self.sampler = getattr(spotpy.algorithms, algorithm)(
 			self.spotpy_setup,
 			dbname=os.path.splitext(self.database_path)[0],
 			dbformat=os.path.splitext(self.database_path)[1][1:],  # result should be 'csv'
@@ -55,16 +56,17 @@ class Optimizer(object):
 		plot_density(self.database_path, self.temp_folder, self.cal_params)
 
 	def getOptimalParams(self):
-		"""Returns optimal parameters as found
+		"""Returns optimal parameters and cost as dictionary
 
 		:return:
 		"""
 		# Load calibration chain and find optimal for like1
 		cal_data = pd.read_csv(self.database_path, sep=',')
 		params = cal_data.ix[cal_data['like1'].idxmax()].to_dict()
+		cost = params['like1']
 		# reformat parameters to match original naming
 		params_reformatted = {}
 		for k, p in self.cal_params.items():
 			params_reformatted[k] = params['par'+k]
 
-		return params_reformatted
+		return params_reformatted, cost

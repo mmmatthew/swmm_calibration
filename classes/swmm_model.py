@@ -2,6 +2,8 @@ import os
 import subprocess
 from string import Template
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 import numpy as np
 from os.path import join
 from datetime import datetime
@@ -31,19 +33,20 @@ class SwmmModel(object):
     swmm_executable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
     # define input and output
     observations = None
+    simulation = None  # where simulation is stored
     eval_data = None
     eval_dates = None
 
     def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt,
                  forcing_data_file, obs_config,
                  cal_params, temp_folder,
-                 sim_reporting_step=timedelta(seconds=5)):
+                 sim_reporting_step_sec=5, dt_format='%Y/%m/%d %H:%M:%S'):
         """
         Initialized model instance with forcing data (inflow to experiment site)
         and evaluation data (water level in basement of house)
         - swmm_model_template: path to swmm template file
-        - sim_start_dt: datetime at which to start simulation e.g. datetime(2016,10,6,14,10)
-        - sim_end_dt: datetime at which to start simulation e.g. datetime(2016,10,6,14,10)
+        - sim_start_dt: datetime at which to start simulation e.g. '2016/10/06 14:06:25' (default format is '%Y/%m/%d %H:%M:%S')
+        - sim_end_dt: datetime at which to start simulation e.g.
         - forcing_data_file: file containing input into system
         - obs_config: dictionary describing observation data and corresponding model variables
         - calibration_params:
@@ -52,13 +55,14 @@ class SwmmModel(object):
         """
         with open(swmm_model_template, 'r') as t:
             self.swmm_model_template = Template(t.read())
-        self.sim_start_dt = sim_start_dt
-        self.sim_end_dt = sim_end_dt
-        self.sim_reporting_step = sim_reporting_step
+        self.sim_start_dt = datetime.strptime(sim_start_dt, dt_format)
+        self.sim_end_dt = datetime.strptime(sim_end_dt, dt_format)
+        self.sim_reporting_step = timedelta(seconds=sim_reporting_step_sec)
         self.cal_params = cal_params
         self.obs_config = obs_config
 
         # define where temporary results should be saved
+        self.temp_folder = temp_folder
         self.temp_model = join(temp_folder, 'model.inp')
         self.output_file = join(temp_folder, 'output.out')
         self.report_file = join(temp_folder, 'report.rpt')
@@ -89,6 +93,8 @@ class SwmmModel(object):
         for obs in obs_config:
             # read data
             obs_data = read_floodx_file(obs['data_file'])
+            # scale data (for units)
+            obs_data.value = obs_data.value * obs['scale_factor']
             # resample: aggregate per second, interpolate
             period = '{0}S'.format(int(self.sim_reporting_step.total_seconds()))
             obs_data = resample_interpolate(obs_data, period)
@@ -104,7 +110,7 @@ class SwmmModel(object):
             else:
                 self.observations[obs['swmm_node'][1]] = obs_data['value']
 
-    def run(self, *params, named_model_params=None):
+    def run(self, *params, named_model_params=None, plot_results=False):
         """
         Runs the SWMM model with specific parameters. The following parameters can be passed.
         :param named_model_params: dictionary of named model parameters. Replaces unnamed params
@@ -134,11 +140,18 @@ class SwmmModel(object):
 
         # read simulation output
         data = swmmtoolbox.extract(self.output_file, *[','.join(x['swmm_node']) for x in self.obs_config])
+        # rename index
+        data.index.rename('datetime', inplace=True)
 
-        # renaming rules
+        # renaming data columns
         rename_dict = dict(('_'.join(o['swmm_node']), o['swmm_node'][1]) for o in self.obs_config)
+        self.simulation = data.rename(index=str, columns=rename_dict)
 
-        return data.rename(index=str, columns=rename_dict)
+        # plot results if necessary
+        if plot_results:
+            self.plot()
+
+        return self.simulation
 
     def apply_parameters(self, model_params):
         # apply simulation params to model
@@ -174,3 +187,26 @@ class SwmmModel(object):
         Formats simulation data so each value corresponds to a data point in evaluation,
         where certain time steps are missing
         """
+
+    def plot(self):
+        # copy observations
+        df_obs = self.observations.copy()
+        # transform to long format
+        df_obs = pd.melt(df_obs.reset_index(), id_vars='datetime', var_name='location')
+        # convert date string into datetime
+        df_obs.datetime = pd.to_datetime(df_obs.datetime)
+        # assign as sensor data
+        df_obs['source'] = 'sensor'
+
+        # Repeat for simulation data
+        df_sim = pd.DataFrame(self.simulation)
+        df_sim = pd.melt(df_sim.reset_index(), id_vars='datetime', var_name='location')
+        df_sim.datetime = pd.to_datetime(df_sim.datetime)
+        # assign as sensor data
+        df_sim['source'] = 'simulation'
+
+        #combine data and plot
+        df = df_sim.append(df_obs, ignore_index=True)
+        sns.lineplot(x='datetime', y='value', data=df, style='source', hue='location')
+        plt.savefig(os.path.join(self.temp_folder, 'simulation.png'))
+        plt.clf()
