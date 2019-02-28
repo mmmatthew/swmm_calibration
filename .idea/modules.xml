@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:/_temp/swmm/.idea/swmm.iml" filepath="C:/_temp/swmm/.idea/swmm.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/swmm_calibration.iml" filepath="$PROJECT_DIR$/.idea/swmm_calibration.iml" />
     </modules>
   </component>
