@@ -100,7 +100,8 @@ class SwmmModel(object):
             obs_data = resample_interpolate(obs_data, period)
             # clip to simulation time
             shift = timedelta(seconds=int(self.sim_reporting_step.total_seconds()))
-            obs_data = obs_data.loc[self.sim_start_dt + shift: self.sim_end_dt - shift]
+            obs_data = obs_data.loc[self.sim_start_dt + shift: self.sim_end_dt]
+            obs_data['value'] = obs_data['value'] / 1000  # convert to meters
 
             self.eval_data = list(obs_data['value'])
             self.eval_dates = list(obs_data.index)
