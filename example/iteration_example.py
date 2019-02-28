@@ -7,10 +7,10 @@ from example import settings
 
 s = settings.Settings
 
-for i in [5, 60]:
+for i in [1000, 1500]:
 	# get temporary directory for saving working files. By default define a new one
 	nowstring = datetime.strftime(datetime.now(), '%Y%m%d_%H.%M')
 	temp_folder = 'results/' + nowstring
-	s.calibration_algorithm = 'sa'
+	s.calibration_algorithm = 'sceua'
 	exp = experiment_runner.ExperimentRunner(data_directory=temp_folder, output_file='results/experiments.csv', settings=s)
 	exp.run(print_final=True, repetitions=i)
