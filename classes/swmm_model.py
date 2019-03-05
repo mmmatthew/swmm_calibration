@@ -134,6 +134,7 @@ class SwmmModel(object):
         self.apply_parameters(model_params)
 
         # Run model
+        # Todo: What happens if the model is run in parallel
         with open(os.devnull, "w") as f:
             subprocess.call([self.swmm_executable, self.temp_model, self.report_file, self.output_file],
                             stdout=f)

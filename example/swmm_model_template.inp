@@ -96,7 +96,7 @@ p6               v4               v7               2.35       $r_px      0      
 [ORIFICES]
 ;;Name           From Node        To Node          Type         Offset     Qcoeff     Gated    CloseTime
 ;;-------------- ---------------- ---------------- ------------ ---------- ---------- -------- ----------
-r5               s6               m3               BOTTOM       0          0.65       NO       0
+r5               s6               m3               BOTTOM       0          $c_m3       NO       0
 r6               s5               v9               SIDE         0          0.65       NO       0
 r4               s5               v7               SIDE         0          0.6        NO       0
 r3               s4               m2               BOTTOM       0          0.65       NO       0
