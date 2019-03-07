@@ -1,11 +1,12 @@
 import os
-import pandas as pd
 from os.path import join
 
+import pandas as pd
 import spotpy
-from classes.swmm_model import SwmmModel
 from classes.spotpy_setup import SpotpySwmmSetup
-from classes.optimizer_plotting_utils import plot_chain, plot_density
+from classes.swmm_model import SwmmModel
+
+from swmm_calibration.classes.optimizer_plotting_utils import plot_chain, plot_density
 
 
 class Optimizer(object):

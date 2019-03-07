@@ -1,12 +1,14 @@
-import os
 import glob
-# set the working directory to the location of this file
-# os.chdir('C:/coding/swmm_calibration/example')
-
-from classes import swmm_model, objective_function, optimizer
+import os
 from datetime import datetime
 
+from classes import swmm_model, objective_function
 from example import settings
+
+from swmm_calibration.classes import optimizer
+
+# set the working directory to the location of this file
+# os.chdir('C:/coding/swmm_calibration/example')
 
 s = settings.Settings
 

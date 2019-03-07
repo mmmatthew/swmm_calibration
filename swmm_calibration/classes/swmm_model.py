@@ -110,9 +110,11 @@ class SwmmModel(object):
             else:
                 self.observations[obs['swmm_node'][1]] = obs_data['value']
 
-    def run(self, *params, named_model_params=None, plot_results=False):
+    def run(self, *params, named_model_params=None, plot_results=False, plot_title=None):
         """
         Runs the SWMM model with specific parameters. The following parameters can be passed.
+        :param plot_results: Boolean, whether to plot results or not
+        :param plot_title: Title of plot
         :param named_model_params: dictionary of named model parameters. Replaces unnamed params
         :param multiple unnamed params: 1st: surface roughness
         :return: the simulation of the model
@@ -150,7 +152,7 @@ class SwmmModel(object):
 
         # plot results if necessary
         if plot_results:
-            self.plot()
+            self.plot(plot_title)
 
         return self.simulation
 
@@ -189,7 +191,7 @@ class SwmmModel(object):
         where certain time steps are missing
         """
 
-    def plot(self):
+    def plot(self, plot_title='Simulation'):
         # copy observations
         df_obs = self.observations.copy()
         # transform to long format
@@ -210,5 +212,6 @@ class SwmmModel(object):
         df = df_sim.append(df_obs, ignore_index=True)
         fig, ax = plt.subplots(figsize=(5, 3))
         sns.lineplot(x='datetime', y='value', data=df, style='source', hue='location', ax=ax)
-        plt.savefig(os.path.join(self.temp_folder, 'simulation.png'))
+        ax.set_title(plot_title)
+        plt.savefig(os.path.join(self.temp_folder, 'simulation_{title}.png'.format(title=plot_title.lower())))
         plt.clf()

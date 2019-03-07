@@ -1,7 +1,8 @@
 from os.path import join
 
-from classes import optimizer_plotting_utils
 from example import settings as s
+
+from swmm_calibration.classes import optimizer_plotting_utils
 
 temp_folder = 'results/20190206_17.32'
 
