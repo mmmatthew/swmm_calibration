@@ -3,10 +3,10 @@ from os.path import join
 
 import pandas as pd
 import spotpy
-from classes.spotpy_setup import SpotpySwmmSetup
-from classes.swmm_model import SwmmModel
+from .spotpy_setup import SpotpySwmmSetup
+from .swmm_model import SwmmModel
 
-from swmm_calibration.classes.optimizer_plotting_utils import plot_chain, plot_density
+from .optimizer_plotting_utils import plot_chain, plot_density
 
 
 class Optimizer(object):

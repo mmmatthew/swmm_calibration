@@ -3,9 +3,9 @@ import os
 import pickle
 
 import pandas as pd
-from classes import swmm_model, objective_function
+from . import swmm_model, objective_function
 
-from swmm_calibration.classes import optimizer
+from . import optimizer
 
 
 class ExperimentRunner(object):
