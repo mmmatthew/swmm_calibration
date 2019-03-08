@@ -20,22 +20,22 @@ class Settings(object):
         's_r': {
             "display_name": 'Surface roughness',
             'rank': 0,
-            'bounds': [0.005, 0.1]
+            'bounds': [0, 0.03]
         },
         'r_p3': {
             "display_name": 'Roughness (pipe p3)',
             'rank': 1,
-            'bounds': [0.005, 0.05]
+            'bounds': [0, 0.03]
         },
         'r_p7': {
             "display_name": 'Roughness (pipe p7)',
             'rank': 2,
-            'bounds': [0.005, 0.05]
+            'bounds': [0, 0.03]
         },
         'r_px': {
             "display_name": 'Roughness (other pipes)',
             'rank': 3,
-            'bounds': [0.005, 0.05]
+            'bounds': [0, 0.03]
         },
         'c_m1': {
             "display_name": 'Capacity manhole m1',
@@ -84,8 +84,11 @@ class Settings(object):
             }
         }
     }
-    observations_configuration = [
-        obs_available['s3'],
-        obs_available['s5'],
-        obs_available['s6'],
+    obs_config_calibration = [
+        's5', 's6'
+    ]
+    obs_config_validation = [
+        's3',
+        's5',
+        's6'
     ]

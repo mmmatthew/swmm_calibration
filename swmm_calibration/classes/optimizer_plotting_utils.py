@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from os.path import join
 
+
 # self is an optimizer as defined in optimizer.py
 
 
@@ -23,16 +24,16 @@ def plot_chain(database_path, temp_folder):
 
     # Plot the lines on two facets
     sns_plot = sns.relplot(x="iteration", y="param_value",
-                hue="chain", row="param_name", palette=palette,
-                aspect=5, facet_kws=dict(sharex=False, sharey=False),
-                kind="line", legend="full", data=data_reshaped)
+                           hue="chain", row="param_name", palette=palette,
+                           aspect=5, facet_kws=dict(sharex=False, sharey=False),
+                           kind="line", legend="full", data=data_reshaped)
 
     sns_plot.savefig(join(temp_folder, "calibration_chain.png"))
     plt.clf()
 
 
 # plot parameter distributions
-def plot_density(database_path, temp_folder, cal_params, uselast: int=200):
+def plot_density(database_path, temp_folder, cal_params, uselast: int = 200):
     sns.set(style="dark")
 
     # read data
@@ -41,13 +42,24 @@ def plot_density(database_path, temp_folder, cal_params, uselast: int=200):
     # remove burn-in
     data = data.iloc[-uselast:]
 
-
-    variables = ['par'+k for k, p in cal_params.items()]
+    variables = ['par' + k for k, p in cal_params.items()]
     names = [p['display_name'] for k, p in cal_params.items()]
 
     g = sns.PairGrid(data, vars=variables, diag_sharey=False)
     g.map_lower(sns.kdeplot)
     g.map_upper(sns.scatterplot, size=1)
     g.map_diag(sns.kdeplot)
-    g.savefig(join(temp_folder, "parameter_sampling_distributions.png"))
+    # loop through plots
+    for i, val_i in enumerate(variables):  # Y dimension
+        for j, val_j in enumerate(variables):  # X dimension
+            ax = g.axes[i, j]
+            if i == len(variables) - 1:
+                ax.set_xlim(*cal_params[val_j[3:]]['bounds'])
+                ax.set_xlabel(cal_params[val_j[3:]]['display_name'])
+            if j == 0:
+                ax.set_ylim(*cal_params[val_i[3:]]['bounds'])
+                ax.set_ylabel(cal_params[val_i[3:]]['display_name'])
+
+    path = join(temp_folder, "parameter_sampling_distributions.png")
+    g.savefig(path)
     plt.clf()

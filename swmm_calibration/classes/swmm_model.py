@@ -33,12 +33,15 @@ class SwmmModel(object):
     swmm_executable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
     # define input and output
     observations = None
+    obs_validation = None
+    obs_calibration = None
     simulation = None  # where simulation is stored
     eval_data = None
     eval_dates = None
 
     def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt,
-                 forcing_data_file, obs_config,
+                 forcing_data_file,
+                 obs_available, obs_config_calibration, obs_config_validation,
                  cal_params, temp_folder,
                  sim_reporting_step_sec=5, dt_format='%Y/%m/%d %H:%M:%S'):
         """
@@ -48,8 +51,10 @@ class SwmmModel(object):
         - sim_start_dt: datetime at which to start simulation e.g. '2016/10/06 14:06:25' (default format is '%Y/%m/%d %H:%M:%S')
         - sim_end_dt: datetime at which to start simulation e.g.
         - forcing_data_file: file containing input into system
-        - obs_config: dictionary describing observation data and corresponding model variables
-        - calibration_params:
+        - obs_available: dictionary describing observation data and corresponding model variables
+        - obs_config_calibration: list of names designating which obs data should be used for calibration
+        - obs_config_validation: list of names designating which obs data should be used for validation
+        - cal_params: dict describing which parameters should be calibrated
         - sim_reporting_step: resolution at which simulation should be reported (simulation step is 1 second)
         - cal_params: physical parameter boundaries
         """
@@ -59,7 +64,9 @@ class SwmmModel(object):
         self.sim_end_dt = datetime.strptime(sim_end_dt, dt_format)
         self.sim_reporting_step = timedelta(seconds=sim_reporting_step_sec)
         self.cal_params = cal_params
-        self.obs_config = obs_config
+        self.obs_available = obs_available
+        self.obs_config_calibration = obs_config_calibration
+        self.obs_config_validation = obs_config_validation
 
         # define where temporary results should be saved
         self.temp_folder = temp_folder
@@ -69,7 +76,7 @@ class SwmmModel(object):
         self.temp_forcing_data_file = join(temp_folder, 'forcing_data.txt')
 
         # Read observation data and filter to fit experiment duration
-        self.read_observations(obs_config)
+        self.read_observations(obs_available)
 
         # Read forcing data and reformat
         self.read_forcing(forcing_data_file)
@@ -90,7 +97,7 @@ class SwmmModel(object):
                     header=False)
 
     def read_observations(self, obs_config):
-        for obs in obs_config:
+        for obs_name, obs in obs_config.items():
             # read data
             obs_data = read_floodx_file(obs['data_file'])
             # scale data (for units)
@@ -104,21 +111,28 @@ class SwmmModel(object):
 
             self.eval_data = list(obs_data['value'])
             self.eval_dates = list(obs_data.index)
-            # set column name and append to obs
+            # set column name as name used for observation in settings and append to obs
             if self.observations is None:
-                self.observations = obs_data.rename(index=str, columns={'value': obs['swmm_node'][1]})
+                self.observations = obs_data.rename(index=str, columns={'value': obs_name})
             else:
-                self.observations[obs['swmm_node'][1]] = obs_data['value']
+                self.observations[obs_name] = obs_data['value']
+        # store observations in easy-to access containers
+        self.obs_validation = self.observations[self.obs_config_validation]
+        self.obs_calibration = self.observations[self.obs_config_calibration]
 
-    def run(self, *params, named_model_params=None, plot_results=False, plot_title=None):
+    def run(self, *params, named_model_params=None, obs_list=None, plot_results=False, plot_title=None):
         """
         Runs the SWMM model with specific parameters. The following parameters can be passed.
+        :param obs_list: list of measurement points that should be returned
         :param plot_results: Boolean, whether to plot results or not
         :param plot_title: Title of plot
         :param named_model_params: dictionary of named model parameters. Replaces unnamed params
         :param multiple unnamed params: 1st: surface roughness
         :return: the simulation of the model
         """
+
+        if obs_list is None:
+            obs_list = self.obs_config_calibration
 
         # if only unnamed params are given, change how parameters are stored in order to feed to swmm model
         model_params = {}
@@ -136,18 +150,18 @@ class SwmmModel(object):
         self.apply_parameters(model_params)
 
         # Run model
-        # Todo: What happens if the model is run in parallel
+        # Todo: What happens if the model is run in parallel?
         with open(os.devnull, "w") as f:
             subprocess.call([self.swmm_executable, self.temp_model, self.report_file, self.output_file],
                             stdout=f)
 
         # read simulation output
-        data = swmmtoolbox.extract(self.output_file, *[','.join(x['swmm_node']) for x in self.obs_config])
+        data = swmmtoolbox.extract(self.output_file, *[','.join(self.obs_available[o]['swmm_node']) for o in obs_list])
         # rename index
         data.index.rename('datetime', inplace=True)
 
         # renaming data columns
-        rename_dict = dict(('_'.join(o['swmm_node']), o['swmm_node'][1]) for o in self.obs_config)
+        rename_dict = dict(('_'.join(self.obs_available[o]['swmm_node']), self.obs_available[o]['swmm_node'][1]) for o in obs_list)
         self.simulation = data.rename(index=str, columns=rename_dict)
 
         # plot results if necessary

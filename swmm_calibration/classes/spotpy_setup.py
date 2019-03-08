@@ -17,11 +17,14 @@ class SpotpySwmmSetup(object):
         simulations = self.model.run(*vector)
         return simulations
 
-    def evaluation(self, evaldates=False):
+    def evaluation(self, evaldates=False, validation=False):
         if evaldates:
             return self.model.eval_dates
+        elif not validation:
+            # return observations for calibration
+            return self.model.obs_calibration
         else:
-            return self.model.observations
+            return self.model.obs_validation
 
 
 

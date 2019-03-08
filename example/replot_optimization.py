@@ -1,10 +1,12 @@
 from os.path import join
 
-from example import settings as s
+from example import settings
 
 from swmm_calibration.classes import optimizer_plotting_utils
 
-temp_folder = 'results/20190206_17.32'
+s = settings.Settings
+
+temp_folder = 'results/test/1'
 
 # plot results
 optimizer_plotting_utils.plot_density(
@@ -13,7 +15,7 @@ optimizer_plotting_utils.plot_density(
     s.calibration_parameters
 )
 
-optimizer_plotting_utils.plot_chain(
-    join(temp_folder, 'iterations.csv'),
-    temp_folder
-)
+# optimizer_plotting_utils.plot_chain(
+#     join(temp_folder, 'iterations.csv'),
+#     temp_folder
+# )
