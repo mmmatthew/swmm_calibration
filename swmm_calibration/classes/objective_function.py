@@ -13,7 +13,7 @@ class ObjectiveFunction(object):
         objfun = []
         for obs_name in list(evaluation.columns.values):
             # Extract data
-            evalu = evaluation[[self.obs_config[obs_name]['swmm_node'][1]]]
+            evalu = evaluation[obs_name]
             sim = simulation[[self.obs_config[obs_name]['swmm_node'][1]]]
 
             # Guarantee same time and data is compared
