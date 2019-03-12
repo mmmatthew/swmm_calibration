@@ -9,8 +9,8 @@ class Settings(object):
     validation_events = [
         {
             "name": 'Exp 20',
-            "start_dt": '2016/10/06 14:06:25',  # start every 5 sec. (00:00:03 is bad). Format is important
-            "end_dt": '2016/10/06 14:21:00'
+            "start_dt": '2016/10/06 14:32:25',  # start every 5 sec. (00:00:03 is bad). Format is important
+            "end_dt": '2016/10/06 14:48:00'
         }
     ]
     sim_reporting_step_sec = 5  # in seconds
@@ -60,7 +60,7 @@ class Settings(object):
             "swmm_node": ['node', 's6', 'Depth_above_invert'],
             "calibration": {
                 "obj_fun": 'rmse',
-                "weight": 1  # weight should be positive if obj_fun should be maximized
+                "weight": 1  # weight should be negative if obj_fun should be maximized
             }
         }
         ,

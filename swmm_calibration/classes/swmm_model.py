@@ -224,7 +224,7 @@ class SwmmModel(object):
 
         #combine data and plot
         df = df_sim.append(df_obs, ignore_index=True)
-        fig, ax = plt.subplots(figsize=(5, 3))
+        fig, ax = plt.subplots(figsize=(7, 5))
         sns.lineplot(x='datetime', y='value', data=df, style='source', hue='location', ax=ax)
         ax.set_title(plot_title)
         plt.savefig(os.path.join(self.temp_folder, 'simulation_{title}.png'.format(title=plot_title.lower())))

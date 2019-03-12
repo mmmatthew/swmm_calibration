@@ -88,7 +88,7 @@ class ExperimentRunner(object):
             )
             # run simulation
             sim = model_val.run(named_model_params=self.params_opt, plot_results=True,
-                                plot_title='Validation '+val_event['name'],
+                                plot_title='Validation with {} - calibrated on {}'.format(val_event['name'], self.s.calibration_event['name']),
                                 obs_list=self.s.obs_config_validation)
             # evaluate simulation
             performance = self.obj_fun.evaluate(simulation=sim,
