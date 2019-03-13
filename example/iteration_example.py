@@ -14,4 +14,4 @@ for i in [5000]:
     temp_folder = 'results/test/2'  # + nowstring
     exp = experiment_runner.ExperimentRunner(data_directory=temp_folder, output_file='results/experiments.csv',
                                              settings=s, experiment_metadata={'count_sensors': 1})
-    exp.run(repetitions=1000, kstop=5, ngs=5, pcento=0.5)
+    exp.run(repetitions=100, kstop=5, ngs=5, pcento=0.5)

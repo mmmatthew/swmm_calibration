@@ -61,7 +61,7 @@ class ExperimentRunner(object):
         # todo: print and evaluate results for all sensor locations
         sim = self.model_cal.run(named_model_params=self.params_opt,
                                  plot_results=True, plot_title='Calibration '+self.s.calibration_event['name'],
-                                 obs_list=self.s.obs_config_validation)
+                                 obs_list=self.s.obs_config_validation, run_type='validation')
         performance = self.obj_fun.evaluate(simulation=sim,
                                             evaluation=self.model_cal.obs_validation)
 
@@ -89,7 +89,7 @@ class ExperimentRunner(object):
             # run simulation
             sim = model_val.run(named_model_params=self.params_opt, plot_results=True,
                                 plot_title='Validation with {} - calibrated on {}'.format(val_event['name'], self.s.calibration_event['name']),
-                                obs_list=self.s.obs_config_validation)
+                                obs_list=self.s.obs_config_validation, run_type='validation')
             # evaluate simulation
             performance = self.obj_fun.evaluate(simulation=sim,
                                                 evaluation=self.model_cal.obs_validation)

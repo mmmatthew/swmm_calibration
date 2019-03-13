@@ -8,7 +8,7 @@ class Settings(object):
     # list of periods to be used for validation
     validation_events = [
         {
-            "name": 'Exp 20',
+            "name": 'Exp 21',
             "start_dt": '2016/10/06 14:32:25',  # start every 5 sec. (00:00:03 is bad). Format is important
             "end_dt": '2016/10/06 14:48:00'
         }
@@ -54,18 +54,22 @@ class Settings(object):
         }
     }
     obs_available = {
-        's6': {
+        's6_sensor': {
             "data_file": 'data/all_s6_h_us_maxbotix.txt',
+            "location": 's6',
+            "data_type": 'sensor',
             "scale_factor": 0.001,
             "swmm_node": ['node', 's6', 'Depth_above_invert'],
             "calibration": {
                 "obj_fun": 'rmse',
-                "weight": 1  # weight should be negative if obj_fun should be maximized
+                "weight": 1  # weight should be positive if obj_fun should be minimized
             }
         }
         ,
-        's5': {
+        's5_sensor': {
             "data_file": 'data/all_s5_h_us_maxbotix_2.txt',
+            "location": 's5',
+            "data_type": 'sensor',
             "scale_factor": 0.001,
             "swmm_node": ['node', 's5', 'Depth_above_invert'],
             "calibration": {
@@ -74,21 +78,58 @@ class Settings(object):
             }
         }
         ,
-        's3': {
+        's3_sensor': {
             "data_file": 'data/all_s3_h_us_maxbotix.txt',
+            "location": 's3',
+            "data_type": 'sensor',
             "scale_factor": 0.001,
             "swmm_node": ['node', 's3', 'Depth_above_invert'],
             "calibration": {
                 "obj_fun": 'rmse',
                 "weight": 1
             }
+        },
+        's6_trend': {
+            "data_file": 'data/all_s6_h_us_maxbotix.txt',
+            "location": 's6',
+            "data_type": 'trend',
+            "scale_factor": 0.001,
+            "swmm_node": ['node', 's6', 'Depth_above_invert'],
+            "calibration": {
+                "obj_fun": 'spearman',
+                "weight": -1  # weight should be positive if obj_fun should be minimized
+            }
+        }
+        ,
+        's5_trend': {
+            "data_file": 'data/all_s5_h_us_maxbotix_2.txt',
+            "location": 's5',
+            "data_type": 'trend',
+            "scale_factor": 0.001,
+            "swmm_node": ['node', 's5', 'Depth_above_invert'],
+            "calibration": {
+                "obj_fun": 'spearman',
+                "weight": -1
+            }
+        }
+        ,
+        's3_trend': {
+            "data_file": 'data/all_s3_h_us_maxbotix.txt',
+            "location": 's3',
+            "data_type": 'trend',
+            "scale_factor": 0.001,
+            "swmm_node": ['node', 's3', 'Depth_above_invert'],
+            "calibration": {
+                "obj_fun": 'spearman',
+                "weight": -1
+            }
         }
     }
     obs_config_calibration = [
-        's5', 's6'
+        's5_trend', 's6_trend'
     ]
     obs_config_validation = [
-        's3',
-        's5',
-        's6'
+        's3_sensor',
+        's5_sensor',
+        's6_sensor'
     ]

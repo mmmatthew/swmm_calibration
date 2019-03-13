@@ -120,9 +120,10 @@ class SwmmModel(object):
         self.obs_validation = self.observations[self.obs_config_validation]
         self.obs_calibration = self.observations[self.obs_config_calibration]
 
-    def run(self, *params, named_model_params=None, obs_list=None, plot_results=False, plot_title=None):
+    def run(self, *params, named_model_params=None, obs_list=None, plot_results=False, plot_title=None, run_type='calibration'):
         """
         Runs the SWMM model with specific parameters. The following parameters can be passed.
+        :param run_type: whether a calibration or validation run is meant. relevant for plotting
         :param obs_list: list of measurement points that should be returned
         :param plot_results: Boolean, whether to plot results or not
         :param plot_title: Title of plot
@@ -161,12 +162,12 @@ class SwmmModel(object):
         data.index.rename('datetime', inplace=True)
 
         # renaming data columns
-        rename_dict = dict(('_'.join(self.obs_available[o]['swmm_node']), self.obs_available[o]['swmm_node'][1]) for o in obs_list)
+        rename_dict = dict(('_'.join(self.obs_available[o]['swmm_node']), o) for o in obs_list)
         self.simulation = data.rename(index=str, columns=rename_dict)
 
         # plot results if necessary
         if plot_results:
-            self.plot(plot_title)
+            self.plot(plot_title, run_type=run_type)
 
         return self.simulation
 
@@ -205,24 +206,33 @@ class SwmmModel(object):
         where certain time steps are missing
         """
 
-    def plot(self, plot_title='Simulation'):
+    def plot(self, plot_title='Simulation', run_type='calibration'):
         # copy observations
-        df_obs = self.observations.copy()
+        if run_type == 'calibration':
+            df_obs = self.obs_calibration.copy()
+        else:
+            df_obs = self.obs_validation.copy()
         # transform to long format
-        df_obs = pd.melt(df_obs.reset_index(), id_vars='datetime', var_name='location')
+        df_obs = pd.melt(df_obs.reset_index(), id_vars='datetime', var_name='name')
+        # extract location and data type
+        df_obs['location'] = [self.obs_available[n]['location'] for n in df_obs.name]
+        df_obs['data_type'] = [self.obs_available[n]['data_type'] for n in df_obs.name]
         # convert date string into datetime
         df_obs.datetime = pd.to_datetime(df_obs.datetime)
         # assign as sensor data
-        df_obs['source'] = 'sensor'
+        df_obs['source'] = 'experiment'
 
         # Repeat for simulation data
         df_sim = pd.DataFrame(self.simulation)
-        df_sim = pd.melt(df_sim.reset_index(), id_vars='datetime', var_name='location')
+        df_sim = pd.melt(df_sim.reset_index(), id_vars='datetime', var_name='name')
+        # extract location and data type
+        df_sim['location'] = [self.obs_available[n]['location'] for n in df_sim.name]
+        df_sim['data_type'] = 'virtual sensor'
         df_sim.datetime = pd.to_datetime(df_sim.datetime)
         # assign as sensor data
         df_sim['source'] = 'simulation'
 
-        #combine data and plot
+        # combine data and plot
         df = df_sim.append(df_obs, ignore_index=True)
         fig, ax = plt.subplots(figsize=(7, 5))
         sns.lineplot(x='datetime', y='value', data=df, style='source', hue='location', ax=ax)

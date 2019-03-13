@@ -14,7 +14,8 @@ class ObjectiveFunction(object):
         for obs_name in list(evaluation.columns.values):
             # Extract data
             evalu = evaluation[obs_name]
-            sim = simulation[[self.obs_config[obs_name]['swmm_node'][1]]]
+            # Simulations extracted as dataframe so that join is possible
+            sim = simulation[[obs_name]]
 
             # Guarantee same time and data is compared
             data = sim.join(evalu, how='right', lsuffix='_sim', rsuffix='_eval')
