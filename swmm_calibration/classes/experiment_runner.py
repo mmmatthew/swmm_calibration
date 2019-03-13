@@ -1,6 +1,7 @@
 import copy
 import os
 import pickle
+import datetime
 
 import pandas as pd
 from . import swmm_model, objective_function
@@ -92,14 +93,17 @@ class ExperimentRunner(object):
                                 obs_list=self.s.obs_config_validation, run_type='validation')
             # evaluate simulation
             performance = self.obj_fun.evaluate(simulation=sim,
-                                                evaluation=self.model_cal.obs_validation)
+                                                evaluation=model_val.obs_validation)
             self.save_results(performance=performance, event_type='validation')
+
+            del model_val
 
     def save_results(self, performance, event_type):
         # save params and cost to file
         df = pd.DataFrame({'par_'+key: pd.Series(value) for key, value in self.params_opt.items()})
         df['performance'] = [performance]
         df['type'] = [event_type]
+        df['time'] = datetime.datetime.now()
         for key, value in self.experiment_metadata.items():
             df['meta_'+key] = [value]
         if not os.path.isfile(self.output_file):
