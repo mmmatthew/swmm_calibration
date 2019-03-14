@@ -239,3 +239,4 @@ class SwmmModel(object):
         ax.set_title(plot_title)
         plt.savefig(os.path.join(self.temp_folder, 'simulation_{title}.png'.format(title=plot_title.lower())))
         plt.clf()
+        plt.close()

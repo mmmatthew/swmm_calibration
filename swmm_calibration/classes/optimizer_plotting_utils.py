@@ -30,6 +30,7 @@ def plot_chain(database_path, temp_folder):
 
     sns_plot.savefig(join(temp_folder, "calibration_chain.png"))
     plt.clf()
+    plt.close()
 
 
 # plot parameter distributions
@@ -63,3 +64,4 @@ def plot_density(database_path, temp_folder, cal_params, uselast: int = 200):
     path = join(temp_folder, "parameter_sampling_distributions.png")
     g.savefig(path)
     plt.clf()
+    plt.close()
