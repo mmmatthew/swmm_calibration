@@ -56,7 +56,7 @@ class ExperimentRunner(object):
     def run(self, **kwargs):
         self.calibrator.run(**kwargs)
         self.calibrator.plot()
-        self.params_opt, cost = self.calibrator.getOptimalParams()
+        self.params_opt, cost, run_count = self.calibrator.getOptimalParams()
 
         # run calibration model and print output (optional)
         # todo: print and evaluate results for all sensor locations
@@ -66,7 +66,7 @@ class ExperimentRunner(object):
         performance = self.obj_fun.evaluate(simulation=sim,
                                             evaluation=self.model_cal.obs_validation)
 
-        self.save_results(performance=performance, event_type='calibration')
+        self.save_results(performance=performance, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_count)
 
         self.evaluate()
 
@@ -94,18 +94,21 @@ class ExperimentRunner(object):
             # evaluate simulation
             performance = self.obj_fun.evaluate(simulation=sim,
                                                 evaluation=model_val.obs_validation)
-            self.save_results(performance=performance, event_type='validation')
+            self.save_results(performance=performance, event_type='validation', event_name=val_event['name'])
 
             del model_val
 
-    def save_results(self, performance, event_type):
+    def save_results(self, performance, event_type, event_name, run_count=0):
         # save params and cost to file
         df = pd.DataFrame({'par_'+key: pd.Series(value) for key, value in self.params_opt.items()})
-        df['performance'] = [performance]
+        df['error'] = [performance]
+        df['run_count'] = [run_count]
         df['type'] = [event_type]
         df['time'] = datetime.datetime.now()
+        df['meta_event_val'] = event_name
         for key, value in self.experiment_metadata.items():
             df['meta_'+key] = [value]
+
         if not os.path.isfile(self.output_file):
             df.to_csv(self.output_file, mode='w', header=True, index=False)
         else:

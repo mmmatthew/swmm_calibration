@@ -11,8 +11,7 @@ from .optimizer_plotting_utils import plot_chain, plot_density
 
 class Optimizer(object):
     """Optimizes a model with given objective functions, parameter ranges
-
-	"""
+    """
 
     def __init__(self, model: SwmmModel, algorithm, cal_params, obj_fun, temp_folder):
         """
@@ -21,7 +20,6 @@ class Optimizer(object):
         :param algorithm: optimization algorithm used
         :param cal_params: definition of calibration parameters including ranges
         :param obj_fun: objective function to be used for calibration
-        :param stopping_criteria:  stopping criteria
         :param temp_folder: where to store intermediate results
         """
 
@@ -39,6 +37,8 @@ class Optimizer(object):
             dbformat=os.path.splitext(self.database_path)[1][1:],  # result should be 'csv'
             alt_objfun=None,  # https://github.com/thouska/spotpy/issues/161
             save_sim=False)
+        # store convergence criteria
+        self.convergence_criteria = None
 
     def run(self, repetitions, **kwargs):
         """
@@ -47,7 +47,7 @@ class Optimizer(object):
         not be accepted
         :param kwargs: keyword arguments as defined in spotpy.algorithms.sceua.sample
         """
-        self.sampler.sample(repetitions, **kwargs)
+        self.convergence_criteria = self.sampler.sample(repetitions, **kwargs)
 
     def plot(self):
         """plots scatter and time series of calibration run
@@ -70,4 +70,4 @@ class Optimizer(object):
         for k, p in self.cal_params.items():
             params_reformatted[k] = params['par' + k]
 
-        return params_reformatted, cost
+        return params_reformatted, cost, cal_data.shape[0]

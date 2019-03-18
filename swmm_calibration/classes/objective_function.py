@@ -31,3 +31,6 @@ class ObjectiveFunction(object):
 
     def spearman(self, data):
         return data.corr(method='spearman').iloc[0, 1]
+
+    def spearman_zero(self, data):
+        return self.spearman(data) - 1

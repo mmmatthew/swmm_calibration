@@ -96,7 +96,7 @@ class Settings(object):
             "scale_factor": 0.001,
             "swmm_node": ['node', 's6', 'Depth_above_invert'],
             "calibration": {
-                "obj_fun": 'spearman',
+                "obj_fun": 'spearman_zero',
                 "weight": -1  # weight should be positive if obj_fun should be minimized
             }
         }
@@ -108,7 +108,7 @@ class Settings(object):
             "scale_factor": 0.001,
             "swmm_node": ['node', 's5', 'Depth_above_invert'],
             "calibration": {
-                "obj_fun": 'spearman',
+                "obj_fun": 'spearman_zero',
                 "weight": -1
             }
         }
@@ -120,7 +120,7 @@ class Settings(object):
             "scale_factor": 0.001,
             "swmm_node": ['node', 's3', 'Depth_above_invert'],
             "calibration": {
-                "obj_fun": 'spearman',
+                "obj_fun": 'spearman_zero',
                 "weight": -1
             }
         }
