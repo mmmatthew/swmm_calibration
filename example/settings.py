@@ -1,14 +1,14 @@
 class Settings(object):
     swmm_model_template = 'swmm_model_template.inp'
     calibration_event = {
-        'name': 'Exp 20',
-        'start_dt': '2016/10/06 14:06:25',  # start every 5 sec. (00:00:03 is bad). Format is important
-        'end_dt': '2016/10/06 14:21:00'
+        'name': 'Exp 21',
+        'start_dt': '2016/10/06 14:56:00',  # start every 5 sec. (00:00:03 is bad). Format is important
+        'end_dt': '2016/10/06 15:13:00'
     }
     # list of periods to be used for validation
     validation_events = [
         {
-            "name": 'Exp 21',
+            "name": 'Exp 20',
             "start_dt": '2016/10/06 14:32:25',  # start every 5 sec. (00:00:03 is bad). Format is important
             "end_dt": '2016/10/06 14:48:00'
         }
