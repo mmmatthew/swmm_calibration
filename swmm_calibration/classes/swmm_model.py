@@ -38,6 +38,7 @@ class SwmmModel(object):
     simulation = None  # where simulation is stored
     eval_data = None
     eval_dates = None
+    temp_model_counter = 0 # counter to ensure that swmm models run in parallel do not use the same .inp file
 
     def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt,
                  forcing_data_file,
@@ -70,9 +71,6 @@ class SwmmModel(object):
 
         # define where temporary results should be saved
         self.temp_folder = temp_folder
-        self.temp_model = join(temp_folder, 'model.inp')
-        self.output_file = join(temp_folder, 'output.out')
-        self.report_file = join(temp_folder, 'report.rpt')
         self.temp_forcing_data_file = join(temp_folder, 'forcing_data.txt')
 
         # Read observation data and filter to fit experiment duration
@@ -147,17 +145,17 @@ class SwmmModel(object):
         if not self.check_parameters(model_params):
             return self.observations * -10000
 
-        # Apply model params to model
-        self.apply_parameters(model_params)
+        # Apply model params to model and return filenames for run
+        temp_model, output_file, report_file = self.apply_parameters(model_params)
 
         # Run model
         # Todo: What happens if the model is run in parallel?
         with open(os.devnull, "w") as f:
-            subprocess.call([self.swmm_executable, self.temp_model, self.report_file, self.output_file],
+            subprocess.call([self.swmm_executable, temp_model, report_file, output_file],
                             stdout=f)
 
         # read simulation output
-        data = swmmtoolbox.extract(self.output_file, *[','.join(self.obs_available[o]['swmm_node']) for o in obs_list])
+        data = swmmtoolbox.extract(output_file, *[','.join(self.obs_available[o]['swmm_node']) for o in obs_list])
         # rename index
         data.index.rename('datetime', inplace=True)
 
@@ -185,8 +183,22 @@ class SwmmModel(object):
 
         # apply parameters to input
         input_mod = self.swmm_model_template.substitute(params)
-        with open(self.temp_model, 'w') as f:
+
+        # generate temporary files for run
+        if self.temp_model_counter >= 10:
+            self.temp_model_counter = 0
+        else:
+            self.temp_model_counter += 1
+        current_dir = join(self.temp_folder, 'model_runs', str(self.temp_model_counter))
+        temp_model = join(current_dir, 'model.inp')
+        output_file = join(current_dir, 'output.out')
+        report_file = join(current_dir, 'report.rpt')
+        if not os.path.exists(current_dir):
+            os.makedirs(current_dir)
+        with open(temp_model, 'w') as f:
             f.write(input_mod)
+
+        return temp_model, output_file, report_file
 
     def check_parameters(self, model_params):
         # check that parameters are within acceptable bounds

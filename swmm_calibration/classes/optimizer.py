@@ -35,6 +35,7 @@ class Optimizer(object):
             self.spotpy_setup,
             dbname=os.path.splitext(self.database_path)[0],
             dbformat=os.path.splitext(self.database_path)[1][1:],  # result should be 'csv'
+            parallel='seq',
             alt_objfun=None,  # https://github.com/thouska/spotpy/issues/161
             save_sim=False)
         # store convergence criteria
