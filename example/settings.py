@@ -53,6 +53,14 @@ class Settings(object):
             'bounds': [0, 10]
         }
     }
+    initial_conditions = {
+        # initial depths
+        'id_m1': 0.8,
+        'id_m2': 0.4,
+        'id_m3': 0.2,
+        'id_4': 0.4,
+        'id_9': 0.4
+    }
     obs_available = {
         's6_sensor': {
             "data_file": 'data/all_s6_h_us_maxbotix.txt',

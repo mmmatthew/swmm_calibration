@@ -31,6 +31,7 @@ class ExperimentRunner(object):
         # create calibration model
         self.model_cal = swmm_model.SwmmModel(
             swmm_model_template=self.s.swmm_model_template,
+            initial_conditions=self.s.initial_conditions,
             sim_start_dt=self.s.calibration_event['start_dt'],
             sim_end_dt=self.s.calibration_event['end_dt'],
             sim_reporting_step_sec=self.s.sim_reporting_step_sec,
@@ -77,6 +78,7 @@ class ExperimentRunner(object):
             # create validation model
             model_val = swmm_model.SwmmModel(
                 swmm_model_template=self.s.swmm_model_template,
+                initial_conditions=self.s.initial_conditions,
                 sim_start_dt=val_event['start_dt'],
                 sim_end_dt=val_event['end_dt'],
                 sim_reporting_step_sec=self.s.sim_reporting_step_sec,

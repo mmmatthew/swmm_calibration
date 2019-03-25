@@ -28,8 +28,10 @@ class ObjectiveFunction(object):
             fname = self.obs_config[obs_name]['calibration']['obj_fun']
             weight = self.obs_config[obs_name]['calibration']['weight']
             objfun.append(weight * getattr(self, fname)(data))
+            print(sum(objfun))
             if print_fitness:
-                print('{}: {}'.format(obs_name, objfun[-1]))
+                # print('{}: {}'.format(obs_name, objfun[-1]))
+                pass
 
         return sum(objfun)
 
@@ -50,12 +52,13 @@ class ObjectiveFunction(object):
             spearman = 0
         else:
             spearman = data[no_zeros].corr(method='spearman').iloc[0, 1]
+            # catch the failing spearman
+            if math.isnan(spearman):
+                spearman = 0
 
         # combine both to make hybrid spearman
         spearman_hybrid = fraction_matching_zeros + spearman * fraction_no_zeros
 
-        if math.isnan(spearman):
-            raise Exception('Spearman error')
 
         return spearman_hybrid
 

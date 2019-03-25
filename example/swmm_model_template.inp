@@ -47,8 +47,8 @@ DRY_ONLY         NO
 [JUNCTIONS]
 ;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded
 ;;-------------- ---------- ---------- ---------- ---------- ----------
-4                417.26     0.3272     0.6        10         0
-9                417.26     0.3272     .6         10         0
+4                417.26     0.3272     $id_4      10         0
+9                417.26     0.3272     $id_9      10         0
 v9               417.94     0          0          10         0
 ;Kv = 6800 m3/h
 v7               417.94     0          0          10         0
@@ -74,9 +74,9 @@ s6               418.44   1          0          TABULAR    storage_s6           
 s5               417.94   1.5        0          TABULAR    storage_s5                   0        0
 s2               417.75   3          2.7        FUNCTIONAL 0         1         2.94     0        0
 s4               419.76   1          0          FUNCTIONAL 0         1         6.81     0        0
-m1               418.34   2.6        0.8        FUNCTIONAL 0         0         1.13     0        0
-m2               417.41   3.35       .553       FUNCTIONAL 0         0         2        0        0
-m3               417.44   2          0.4        FUNCTIONAL 0         0         1.13     0        0
+m1               418.34   2.6        $id_m1     FUNCTIONAL 0         0         0.28     0        0
+m2               417.41   3.35       $id_m2     FUNCTIONAL 0         0         0.5      0        0
+m3               417.44   2          $id_m3     FUNCTIONAL 0         0         0.28     0        0
 
 [CONDUITS]
 ;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow

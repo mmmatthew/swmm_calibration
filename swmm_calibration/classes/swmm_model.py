@@ -32,6 +32,7 @@ def resample_interpolate(data, period):
 class SwmmModel(object):
     swmm_executable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
     # define input and output
+    initial_conditions = None
     observations = None
     obs_validation = None
     obs_calibration = None
@@ -41,7 +42,7 @@ class SwmmModel(object):
     temp_model_counter = 0 # counter to ensure that swmm models run in parallel do not use the same .inp file
 
     def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt,
-                 forcing_data_file,
+                 forcing_data_file, initial_conditions,
                  obs_available, obs_config_calibration, obs_config_validation,
                  cal_params, temp_folder,
                  sim_reporting_step_sec=5, dt_format='%Y/%m/%d %H:%M:%S'):
@@ -65,6 +66,7 @@ class SwmmModel(object):
         self.sim_end_dt = datetime.strptime(sim_end_dt, dt_format)
         self.sim_reporting_step = timedelta(seconds=sim_reporting_step_sec)
         self.cal_params = cal_params
+        self.initial_conditions = initial_conditions
         self.obs_available = obs_available
         self.obs_config_calibration = obs_config_calibration
         self.obs_config_validation = obs_config_validation
@@ -179,6 +181,9 @@ class SwmmModel(object):
             'sim_end_date': datetime.strftime(self.sim_end_dt, '%m/%d/%Y'),
             'sim_report_step': str(self.sim_reporting_step)
         }
+        # add initial conditions
+        params.update(self.initial_conditions)
+        # add model parameters
         params.update(model_params)
 
         # apply parameters to input
