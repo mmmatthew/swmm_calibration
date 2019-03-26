@@ -13,5 +13,5 @@ for i in [5000]:
     nowstring = datetime.strftime(datetime.now(), '%Y%m%d_%H.%M')
     temp_folder = 'results/test/3'  # + nowstring
     exp = experiment_runner.ExperimentRunner(data_directory=temp_folder, output_file='results/experiments.csv',
-                                             settings=s, experiment_metadata={'count_sensors': 1})
+                                             settings=s, experiment_metadata={'count_sensors': 1}, evaluation_count=10)
     exp.run(repetitions=100, kstop=5, ngs=5, pcento=0.5)

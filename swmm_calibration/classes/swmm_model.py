@@ -208,7 +208,8 @@ class SwmmModel(object):
     def check_parameters(self, model_params):
         # check that parameters are within acceptable bounds
         for param_name, value in model_params.items():
-            if value < self.cal_params[param_name]['bounds'][0] or \
+            if param_name not in self.cal_params.keys() or \
+                    value < self.cal_params[param_name]['bounds'][0] or \
                     value > self.cal_params[param_name]['bounds'][1]:
                 print('## ignored: {p_name} = {p_val}'.format(
                     p_name=param_name,

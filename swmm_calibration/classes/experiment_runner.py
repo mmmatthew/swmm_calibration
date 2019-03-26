@@ -11,13 +11,15 @@ from . import optimizer
 
 class ExperimentRunner(object):
     """Run full calibration experiment with defined settings"""
+    params_opt = []
+    params_opt_run_numbers = []
 
-    def __init__(self, data_directory, output_file, settings, experiment_metadata):
-        self.params_opt = {}
+    def __init__(self, data_directory, output_file, settings, experiment_metadata, evaluation_count=50):
         self.dir = data_directory
         self.output_file = output_file
         self.s = copy.deepcopy(settings)
         self.experiment_metadata = copy.deepcopy(experiment_metadata)
+        self.evaluation_count = evaluation_count
 
         # create directory if it doesn't exist
         if not os.path.exists(data_directory):
@@ -57,23 +59,27 @@ class ExperimentRunner(object):
     def run(self, **kwargs):
         self.calibrator.run(**kwargs)
         self.calibrator.plot()
-        self.params_opt, cost, run_count = self.calibrator.getOptimalParams()
+        # return the 50 best model parameter sets, inlcuding run number for each
+        self.params_opt, self.params_opt_run_numbers = self.calibrator.getOptimalParams(how_many=self.evaluation_count)
 
-        # run calibration model and print output (optional)
-        # todo: print and evaluate results for all sensor locations
-        sim = self.model_cal.run(named_model_params=self.params_opt,
-                                 plot_results=True, plot_title='Calibration '+self.s.calibration_event['name'],
-                                 obs_list=self.s.obs_config_validation, run_type='validation')
-        performance = self.obj_fun.evaluate(simulation=sim,
-                                            evaluation=self.model_cal.obs_validation)
+        # run calibration model for all parameter sets and print output for first (supposedly best one)
+        for idx, (paramset, run_number) in enumerate(zip(self.params_opt, self.params_opt_run_numbers)):
+            sim = self.model_cal.run(named_model_params=paramset,
+                                     plot_results=(idx == 0), plot_title='Calibration '+self.s.calibration_event['name'],
+                                     obs_list=self.s.obs_config_validation, run_type='validation')
 
-        self.save_results(performance=performance, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_count)
+            # The performance here is different from the cost in the iterations file
+            # because we are using validation observations: usually just sensor data
+            performance = self.obj_fun.evaluate(simulation=sim,
+                                                evaluation=self.model_cal.obs_validation)
+
+            self.save_results(performance=performance, params=paramset, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_number)
 
         self.evaluate()
 
     def evaluate(self):
         # evaluate calibrated model
-        # run validation models and print output
+        # run validation models and print output and save to file
         for val_event in self.s.validation_events:
             # create validation model
             model_val = swmm_model.SwmmModel(
@@ -89,20 +95,21 @@ class ExperimentRunner(object):
                 cal_params=self.s.calibration_parameters,
                 temp_folder=self.dir
             )
-            # run simulation
-            sim = model_val.run(named_model_params=self.params_opt, plot_results=True,
-                                plot_title='Validation with {} - calibrated on {}'.format(val_event['name'], self.s.calibration_event['name']),
-                                obs_list=self.s.obs_config_validation, run_type='validation')
-            # evaluate simulation
-            performance = self.obj_fun.evaluate(simulation=sim,
-                                                evaluation=model_val.obs_validation)
-            self.save_results(performance=performance, event_type='validation', event_name=val_event['name'])
+            # run simulation for each optimal parameter
+            for idx, (paramset, run_number) in enumerate(zip(self.params_opt, self.params_opt_run_numbers)):
+                sim = model_val.run(named_model_params=paramset, plot_results=(idx == 0),  # only plot first (best)
+                                    plot_title='Validation with {} - calibrated on {}'.format(val_event['name'], self.s.calibration_event['name']),
+                                    obs_list=self.s.obs_config_validation, run_type='validation')
+                # evaluate simulation
+                performance = self.obj_fun.evaluate(simulation=sim,
+                                                    evaluation=model_val.obs_validation)
+                self.save_results(performance=performance, params=paramset, event_type='validation', event_name=val_event['name'], run_count=run_number)
 
             del model_val
 
-    def save_results(self, performance, event_type, event_name, run_count=0):
+    def save_results(self, performance, params, event_type, event_name, run_count=0):
         # save params and cost to file
-        df = pd.DataFrame({'par_'+key: pd.Series(value) for key, value in self.params_opt.items()})
+        df = pd.DataFrame({'par_'+key: pd.Series(value) for key, value in params.items()})
         df['error'] = [performance]
         df['run_count'] = [run_count]
         df['type'] = [event_type]

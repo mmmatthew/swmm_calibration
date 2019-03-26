@@ -28,10 +28,6 @@ class ObjectiveFunction(object):
             fname = self.obs_config[obs_name]['calibration']['obj_fun']
             weight = self.obs_config[obs_name]['calibration']['weight']
             objfun.append(weight * getattr(self, fname)(data))
-            print(sum(objfun))
-            if print_fitness:
-                # print('{}: {}'.format(obs_name, objfun[-1]))
-                pass
 
         return sum(objfun)
 

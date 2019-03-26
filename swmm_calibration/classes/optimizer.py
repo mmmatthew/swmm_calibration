@@ -57,18 +57,24 @@ class Optimizer(object):
         plot_chain(self.database_path, self.temp_folder)
         plot_density(self.database_path, self.temp_folder, self.cal_params)
 
-    def getOptimalParams(self):
+    def getOptimalParams(self, how_many:int=50):
         """Returns optimal parameters and cost as dictionary
 
+        :type how_many: int
         :return:
         """
         # Load calibration chain and find optimal for like1
         cal_data = pd.read_csv(self.database_path, sep=',')
-        params = cal_data.ix[cal_data['like1'].idxmax()].to_dict()
-        cost = params['like1']
-        # reformat parameters to match original naming
-        params_reformatted = {}
+        # sort by cost and retain best
+        cal_data = cal_data.sort_values('like1', ascending=False)[:how_many]
+        run_numbers = list(cal_data.index)
+        # drop cost
+        cal_data.drop(['like1', 'chain'], axis=1, inplace=True)
+        # rename columns
+        rename_dict = {}
         for k, p in self.cal_params.items():
-            params_reformatted[k] = params['par' + k]
+            rename_dict['par' + k] = k
+        cal_data.rename(index=str, columns=rename_dict, inplace=True)
+        params = cal_data.to_dict('rows')
 
-        return params_reformatted, cost, cal_data.shape[0]
+        return params, run_numbers
