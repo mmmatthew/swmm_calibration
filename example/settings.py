@@ -3,14 +3,30 @@ class Settings(object):
     calibration_event = {
         'name': 'Exp 21',
         'start_dt': '2016/10/06 14:56:00',  # start every 5 sec. (00:00:03 is bad). Format is important
-        'end_dt': '2016/10/06 15:13:00'
+        'end_dt': '2016/10/06 15:13:00',
+        'initial_conditions': {
+            # initial depths
+            'id_m1': 0.8,
+            'id_m2': 0.4,
+            'id_m3': 0.2,
+            'id_4': 0.4,
+            'id_9': 0.4
+        }
     }
     # list of periods to be used for validation
     validation_events = [
         {
             "name": 'Exp 20',
             "start_dt": '2016/10/06 14:32:25',  # start every 5 sec. (00:00:03 is bad). Format is important
-            "end_dt": '2016/10/06 14:48:00'
+            "end_dt": '2016/10/06 14:48:00',
+            'initial_conditions': {
+                # initial depths
+                'id_m1': 0.0,
+                'id_m2': 0.4,
+                'id_m3': 0.9,
+                'id_4': 0.4,
+                'id_9': 0.4
+            }
         }
     ]
     sim_reporting_step_sec = 5  # in seconds
@@ -52,14 +68,6 @@ class Settings(object):
             'rank': 6,
             'bounds': [0, 10]
         }
-    }
-    initial_conditions = {
-        # initial depths
-        'id_m1': 0.8,
-        'id_m2': 0.4,
-        'id_m3': 0.2,
-        'id_4': 0.4,
-        'id_9': 0.4
     }
     obs_available = {
         's6_sensor': {
