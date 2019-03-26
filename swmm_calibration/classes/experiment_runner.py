@@ -13,6 +13,7 @@ class ExperimentRunner(object):
     """Run full calibration experiment with defined settings"""
     params_opt = []
     params_opt_run_numbers = []
+    calibration_errors = []
 
     def __init__(self, data_directory, output_file, settings, experiment_metadata, evaluation_count=50):
         self.dir = data_directory
@@ -60,10 +61,10 @@ class ExperimentRunner(object):
         self.calibrator.run(**kwargs)
         self.calibrator.plot()
         # return the 50 best model parameter sets, inlcuding run number for each
-        self.params_opt, self.params_opt_run_numbers = self.calibrator.getOptimalParams(how_many=self.evaluation_count)
+        self.params_opt, self.params_opt_run_numbers, self.calibration_errors = self.calibrator.getOptimalParams(how_many=self.evaluation_count)
 
         # run calibration model for all parameter sets and print output for first (supposedly best one)
-        for idx, (paramset, run_number) in enumerate(zip(self.params_opt, self.params_opt_run_numbers)):
+        for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
             sim = self.model_cal.run(named_model_params=paramset,
                                      plot_results=(idx == 0), plot_title='Calibration '+self.s.calibration_event['name'],
                                      obs_list=self.s.obs_config_validation, run_type='validation')
@@ -73,7 +74,7 @@ class ExperimentRunner(object):
             performance = self.obj_fun.evaluate(simulation=sim,
                                                 evaluation=self.model_cal.obs_validation)
 
-            self.save_results(performance=performance, params=paramset, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_number)
+            self.save_results(performance=performance, params=paramset, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_number, cal_err=cal_err)
 
         self.evaluate()
 
@@ -96,22 +97,23 @@ class ExperimentRunner(object):
                 temp_folder=self.dir
             )
             # run simulation for each optimal parameter
-            for idx, (paramset, run_number) in enumerate(zip(self.params_opt, self.params_opt_run_numbers)):
+            for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
                 sim = model_val.run(named_model_params=paramset, plot_results=(idx == 0),  # only plot first (best)
                                     plot_title='Validation with {} - calibrated on {}'.format(val_event['name'], self.s.calibration_event['name']),
                                     obs_list=self.s.obs_config_validation, run_type='validation')
                 # evaluate simulation
                 performance = self.obj_fun.evaluate(simulation=sim,
                                                     evaluation=model_val.obs_validation)
-                self.save_results(performance=performance, params=paramset, event_type='validation', event_name=val_event['name'], run_count=run_number)
+                self.save_results(performance=performance, params=paramset, event_type='validation', event_name=val_event['name'], run_count=run_number, cal_err=cal_err)
 
             del model_val
 
-    def save_results(self, performance, params, event_type, event_name, run_count=0):
+    def save_results(self, performance, params, event_type, event_name, run_count=None, cal_err=None):
         # save params and cost to file
         df = pd.DataFrame({'par_'+key: pd.Series(value) for key, value in params.items()})
         df['error'] = [performance]
         df['run_count'] = [run_count]
+        df['cal_err'] = [cal_err]
         df['type'] = [event_type]
         df['time'] = datetime.datetime.now()
         df['meta_event_val'] = event_name

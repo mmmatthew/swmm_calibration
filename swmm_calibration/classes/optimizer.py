@@ -68,6 +68,7 @@ class Optimizer(object):
         # sort by cost and retain best
         cal_data = cal_data.sort_values('like1', ascending=False)[:how_many]
         run_numbers = list(cal_data.index)
+        calibration_errors = list(cal_data['like1'])
         # drop cost
         cal_data.drop(['like1', 'chain'], axis=1, inplace=True)
         # rename columns
@@ -77,4 +78,4 @@ class Optimizer(object):
         cal_data.rename(index=str, columns=rename_dict, inplace=True)
         params = cal_data.to_dict('rows')
 
-        return params, run_numbers
+        return params, run_numbers, calibration_errors
