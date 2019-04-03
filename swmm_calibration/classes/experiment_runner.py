@@ -43,7 +43,8 @@ class ExperimentRunner(object):
             obs_config_calibration=self.s.obs_config_calibration,
             obs_config_validation=self.s.obs_config_validation,
             cal_params=self.s.calibration_parameters,
-            temp_folder=self.dir
+            temp_folder=self.dir,
+            swmm_exexcutable=self.s.swmm_executable
         )
 
         # define objective function for observations

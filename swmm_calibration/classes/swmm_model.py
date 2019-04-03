@@ -30,7 +30,7 @@ def resample_interpolate(data, period):
 
 
 class SwmmModel(object):
-    swmm_executable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
+    swmm_executable = None
     # define input and output
     initial_conditions = None
     observations = None
@@ -45,7 +45,8 @@ class SwmmModel(object):
                  forcing_data_file, initial_conditions,
                  obs_available, obs_config_calibration, obs_config_validation,
                  cal_params, temp_folder,
-                 sim_reporting_step_sec=5, dt_format='%Y/%m/%d %H:%M:%S'):
+                 sim_reporting_step_sec=5, dt_format='%Y/%m/%d %H:%M:%S',
+                 swmm_exexcutable="C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"):
         """
         Initialized model instance with forcing data (inflow to experiment site)
         and evaluation data (water level in basement of house)
@@ -70,6 +71,7 @@ class SwmmModel(object):
         self.obs_available = obs_available
         self.obs_config_calibration = obs_config_calibration
         self.obs_config_validation = obs_config_validation
+        self.swmm_executable = swmm_exexcutable
 
         # define where temporary results should be saved
         self.temp_folder = temp_folder

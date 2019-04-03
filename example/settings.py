@@ -1,4 +1,5 @@
 class Settings(object):
+    swmm_exexcutable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
     swmm_model_template = 'swmm_model_template.inp'
     calibration_event = {
         'name': 'Exp 21',
