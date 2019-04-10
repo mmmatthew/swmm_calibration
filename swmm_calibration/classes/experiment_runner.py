@@ -89,9 +89,23 @@ class ExperimentRunner(object):
             obj_fun=self.obj_fun.evaluate,
             temp_folder=self.dir)
 
-        performance = self.calibrator.run(repetitions=count)
+        # sample (and run)
+        self.calibrator.run(repetitions=count)
 
-        return performance
+        # return the 50 best model parameter sets, inlcuding run number for each
+        self.params_opt, self.params_opt_run_numbers, self.calibration_errors = self.calibrator.getOptimalParams(how_many=count)
+        # run calibration model for all parameter sets and print output for first (supposedly best one)
+        for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
+            sim = self.model_cal.run(named_model_params=paramset,
+                                     plot_results=(idx == 0), plot_title='Uncalibrated '+self.s.calibration_event['name'],
+                                     obs_list=self.s.obs_config_validation, run_type='validation')
+
+            # The performance here is different from the cost in the iterations file
+            # because we are using validation observations: usually just sensor data
+            performance = self.obj_fun.evaluate(simulation=sim,
+                                                evaluation=self.model_cal.obs_validation)
+
+            self.save_results(performance=performance, params=paramset, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_number, cal_err=cal_err)
 
     def evaluate(self):
         # evaluate calibrated model

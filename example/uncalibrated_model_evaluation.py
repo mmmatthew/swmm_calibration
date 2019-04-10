@@ -11,10 +11,15 @@ for i in [5000]:
     temp_folder = 'results/test/uncalibrated/' + nowstring
     s.obs_config_validation = [
         's3_sensor',
-        # 's5_sensor',
-        # 's6_sensor'
+        's5_sensor',
+        's6_sensor'
     ]
-    exp = experiment_runner.ExperimentRunner(data_directory=temp_folder, output_file='results/experiments.csv',
+    s.obs_config_calibration = [
+        's3_sensor',
+        's5_sensor',
+        's6_sensor'
+    ]
+    exp = experiment_runner.ExperimentRunner(data_directory=temp_folder, output_file='results/uncalibrated_experiments.csv',
                                              settings=s, experiment_metadata={'count_sensors': 1}, evaluation_count=10)
     performance = exp.evaluate_uncalibrated(count=10)
 
