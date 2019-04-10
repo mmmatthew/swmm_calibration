@@ -79,6 +79,20 @@ class ExperimentRunner(object):
 
         self.evaluate()
 
+    def evaluate_uncalibrated(self, count=50):
+        # evaluate model performance with parameter ranges provided
+        # define sampler
+        self.calibrator = optimizer.Optimizer(
+            model=self.model_cal,
+            algorithm='lhs',  # USE LATIN HYPERCUBE SAMPLING
+            cal_params=self.s.calibration_parameters,
+            obj_fun=self.obj_fun.evaluate,
+            temp_folder=self.dir)
+
+        performance = self.calibrator.run(repetitions=count)
+
+        return performance
+
     def evaluate(self):
         # evaluate calibrated model
         # run validation models and print output and save to file
