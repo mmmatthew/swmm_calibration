@@ -91,6 +91,8 @@ class ExperimentRunner(object):
 
         # sample (and run)
         self.calibrator.run(repetitions=count)
+        # plot sampling
+        self.calibrator.plot()
 
         # return the 50 best model parameter sets, inlcuding run number for each
         self.params_opt, self.params_opt_run_numbers, self.calibration_errors = self.calibrator.getOptimalParams(how_many=count)
