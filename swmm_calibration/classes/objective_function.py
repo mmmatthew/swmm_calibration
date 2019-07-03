@@ -24,8 +24,8 @@ class ObjectiveFunction(object):
 
             # set any values below thresholds to zero if objective function is spearman
             if self.obs_config[obs_name]['calibration']['obj_fun'] == 'spearman_zero':
-                sim.where((sim <= self.obs_config[obs_name]['calibration']['zero_threshold_sim']), other=0)
-                evalu.where((evalu <= self.obs_config[obs_name]['calibration']['zero_threshold_obs']), other=0)
+                sim.where((sim <= self.obs_config[obs_name]['calibration']['zero_threshold_sim']), inplace=True, other=0)
+                evalu.where((evalu <= self.obs_config[obs_name]['calibration']['zero_threshold_obs']), inplace=True, other=0)
 
             # Guarantee same time and data is compared
             data = sim.join(evalu, how='inner', lsuffix='_sim', rsuffix='_eval')
