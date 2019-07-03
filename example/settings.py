@@ -72,13 +72,13 @@ class Settings(object):
     }
     obs_available = {
         's6_sensor': {
-            "data_file": 'data/all_s6_h_us_maxbotix.txt',
-            "location": 's6',
-            "data_type": 'sensor',
-            "scale_factor": 0.001,
-            "swmm_node": ['node', 's6', 'Depth_above_invert'],
+            "data_file": 'data/all_s6_h_us_maxbotix.txt',  # where to find data
+            "location": 's6',  # code name of location
+            "data_type": 'sensor',  # type of data source
+            "scale_factor": 0.001,  # how to scale data so that it is comparable to model output
+            "swmm_node": ['node', 's6', 'Depth_above_invert'],  # how to access model output
             "calibration": {
-                "obj_fun": 'rmse',
+                "obj_fun": 'rmse',  # which objective function to use
                 "weight": 1  # weight should be positive if obj_fun should be minimized
             }
         }
@@ -110,11 +110,13 @@ class Settings(object):
             "data_file": 'data/all_s6_h_us_maxbotix.txt',
             "location": 's6',
             "data_type": 'trend',
-            "scale_factor": 0.001,
+            "scale_factor": 1,
             "swmm_node": ['node', 's6', 'Depth_above_invert'],
             "calibration": {
                 "obj_fun": 'spearman_zero',
-                "weight": -1  # weight should be positive if obj_fun should be minimized
+                "weight": -1,
+                "zero_threshold_obs": 0.02,  # for spearman zero obj_fun, we define a
+                "zero_threshold_sim": 0.02  # threshold below which the data and model are considered zero
             }
         }
         ,
@@ -122,11 +124,13 @@ class Settings(object):
             "data_file": 'data/all_s5_h_us_maxbotix_2.txt',
             "location": 's5',
             "data_type": 'trend',
-            "scale_factor": 0.001,
+            "scale_factor": 1,
             "swmm_node": ['node', 's5', 'Depth_above_invert'],
             "calibration": {
                 "obj_fun": 'spearman_zero',
-                "weight": -1
+                "weight": -1,
+                "zero_threshold_obs": 0.02,  # for spearman zero obj_fun, we define a
+                "zero_threshold_sim": 0.02  # threshold below which the data and model are considered zero
             }
         }
         ,
@@ -134,11 +138,13 @@ class Settings(object):
             "data_file": 'data/all_s3_h_us_maxbotix.txt',
             "location": 's3',
             "data_type": 'trend',
-            "scale_factor": 0.001,
+            "scale_factor": 1,
             "swmm_node": ['node', 's3', 'Depth_above_invert'],
             "calibration": {
                 "obj_fun": 'spearman_zero',
-                "weight": -1
+                "weight": -1,
+                "zero_threshold_obs": 0.02,  # for spearman zero obj_fun, we define a
+                "zero_threshold_sim": 0.02  # threshold below which the data and model are considered zero
             }
         }
     }

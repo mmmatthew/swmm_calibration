@@ -22,11 +22,17 @@ class ObjectiveFunction(object):
             # Simulations extracted as dataframe so that join is possible
             sim = simulation[[obs_name]]
 
+            # set any values below thresholds to zero if objective function is spearman
+            if self.obs_config[obs_name]['calibration']['obj_fun'] == 'spearman_zero':
+                sim.where((sim <= self.obs_config[obs_name]['calibration']['zero_threshold_sim']), other=0)
+                evalu.where((evalu <= self.obs_config[obs_name]['calibration']['zero_threshold_obs']), other=0)
+
             # Guarantee same time and data is compared
             data = sim.join(evalu, how='inner', lsuffix='_sim', rsuffix='_eval')
 
             fname = self.obs_config[obs_name]['calibration']['obj_fun']
             weight = self.obs_config[obs_name]['calibration']['weight']
+            # compute objective function value
             objfun.append(weight * getattr(self, fname)(data))
 
         return sum(objfun)
@@ -36,12 +42,12 @@ class ObjectiveFunction(object):
 
     def spearman(self, data):
         # a modified spearman correlation coefficient to account for zeros
-        # timesteps with zeros on both sides are good
-        both_zeros = (data.iloc[:, 0] == 0) & (data.iloc[:, 1] == 0)
+        # find timesteps with zeros for both data series
+        both_zeros = (data.iloc[:, 0] <= 0) & (data.iloc[:, 1] <= 0)
         fraction_matching_zeros = sum(both_zeros) / len(both_zeros)
 
-        # timesteps without any zeros can be checked with pearson
-        no_zeros = (data.iloc[:, 0] != 0) & (data.iloc[:, 1] != 0)
+        # timesteps where both series are larger than zero can be checked with spearman
+        no_zeros = (data.iloc[:, 0] > 0) & (data.iloc[:, 1] > 0)
         fraction_no_zeros = sum(no_zeros) / len(no_zeros)
         # if there is very little data, then don't compute spearman
         if sum(no_zeros) < 10:
