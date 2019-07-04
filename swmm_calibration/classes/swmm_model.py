@@ -44,7 +44,7 @@ class SwmmModel(object):
     def __init__(self, swmm_model_template, sim_start_dt, sim_end_dt,
                  forcing_data_file, initial_conditions,
                  obs_available, obs_config_calibration, obs_config_validation,
-                 cal_params, temp_folder,
+                 cal_params, temp_folder, sim_event_name='',
                  sim_reporting_step_sec=5, dt_format='%Y/%m/%d %H:%M:%S',
                  swmm_exexcutable="C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"):
         """
@@ -53,6 +53,7 @@ class SwmmModel(object):
         - swmm_model_template: path to swmm template file
         - sim_start_dt: datetime at which to start simulation e.g. '2016/10/06 14:06:25' (default format is '%Y/%m/%d %H:%M:%S')
         - sim_end_dt: datetime at which to start simulation e.g.
+        - sim_event_name: name of the simulation, to be used when naming files
         - forcing_data_file: file containing input into system
         - obs_available: dictionary describing observation data and corresponding model variables
         - obs_config_calibration: list of names designating which obs data should be used for calibration
@@ -66,6 +67,7 @@ class SwmmModel(object):
         self.sim_start_dt = datetime.strptime(sim_start_dt, dt_format)
         self.sim_end_dt = datetime.strptime(sim_end_dt, dt_format)
         self.sim_reporting_step = timedelta(seconds=sim_reporting_step_sec)
+        self.sim_event_name = sim_event_name
         self.cal_params = cal_params
         self.initial_conditions = initial_conditions
         self.obs_available = obs_available
@@ -75,7 +77,7 @@ class SwmmModel(object):
 
         # define where temporary results should be saved
         self.temp_folder = temp_folder
-        self.temp_forcing_data_file = join(temp_folder, 'forcing_data.txt')
+        self.temp_forcing_data_file = join(temp_folder, 'forcing_data_{}.txt'.format(self.sim_event_name))
 
         # Read observation data and filter to fit experiment duration
         self.read_observations(obs_available)
@@ -168,6 +170,8 @@ class SwmmModel(object):
         self.simulation = data.rename(index=str, columns=rename_dict)
 
         # plot results if necessary
+        if plot_title is None:
+            plot_title = self.sim_event_name
         if plot_results:
             self.plot(plot_title, run_type=run_type)
 
@@ -197,9 +201,9 @@ class SwmmModel(object):
         else:
             self.temp_model_counter += 1
         current_dir = join(self.temp_folder, 'model_runs', str(self.temp_model_counter))
-        temp_model = join(current_dir, 'model.inp')
-        output_file = join(current_dir, 'output.out')
-        report_file = join(current_dir, 'report.rpt')
+        temp_model = join(current_dir, 'model_{}.inp'.format(self.sim_event_name))
+        output_file = join(current_dir, 'output_{}.out'.format(self.sim_event_name))
+        report_file = join(current_dir, 'report_{}.rpt'.format(self.sim_event_name))
         if not os.path.exists(current_dir):
             os.makedirs(current_dir)
         with open(temp_model, 'w') as f:

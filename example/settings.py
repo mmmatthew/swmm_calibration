@@ -2,7 +2,7 @@ class Settings(object):
     swmm_executable = "C:/Program Files (x86)/EPA SWMM 5.1/swmm5.exe"
     swmm_model_template = 'swmm_model_template.inp'
     calibration_event = {
-        'name': 'Exp 21',
+        'name': '21',
         'start_dt': '2016/10/06 14:56:00',  # start every 5 sec. (00:00:03 is bad). Format is important
         'end_dt': '2016/10/06 15:13:00',
         'initial_conditions': {
@@ -17,7 +17,7 @@ class Settings(object):
     # list of periods to be used for validation
     validation_events = [
         {
-            "name": 'Exp 20',
+            "name": '20',
             "start_dt": '2016/10/06 14:32:25',  # start every 5 sec. (00:00:03 is bad). Format is important
             "end_dt": '2016/10/06 14:48:00',
             'initial_conditions': {
@@ -149,7 +149,7 @@ class Settings(object):
         }
     }
     obs_config_calibration = [
-        's5_trend', 's6_trend'
+        's3_sensor', 's5_sensor', 's6_trend'
     ]
     obs_config_validation = [
         's3_sensor',

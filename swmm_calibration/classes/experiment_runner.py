@@ -15,12 +15,13 @@ class ExperimentRunner(object):
     params_opt_run_numbers = []
     calibration_errors = []
 
-    def __init__(self, data_directory, output_file, settings, experiment_metadata, evaluation_count=50):
+    def __init__(self, data_directory, output_file, settings, experiment_metadata, experiment_name=None, evaluation_count=50):
         self.dir = data_directory
+        self.experiment_name = experiment_name
         self.output_file = output_file
         self.s = copy.deepcopy(settings)
         self.experiment_metadata = copy.deepcopy(experiment_metadata)
-        self.evaluation_count = evaluation_count
+        self.evaluation_count = evaluation_count  # how many of the model runs should be evaluated?
 
         # create directory if it doesn't exist
         if not os.path.exists(data_directory):
@@ -37,6 +38,7 @@ class ExperimentRunner(object):
             initial_conditions=self.s.calibration_event['initial_conditions'],
             sim_start_dt=self.s.calibration_event['start_dt'],
             sim_end_dt=self.s.calibration_event['end_dt'],
+            sim_event_name='{}_cal{}'.format(experiment_name, self.s.calibration_event['name']),
             sim_reporting_step_sec=self.s.sim_reporting_step_sec,
             forcing_data_file=self.s.forcing_data_file,
             obs_available=self.s.obs_available,
@@ -67,7 +69,8 @@ class ExperimentRunner(object):
         # run calibration model for all parameter sets and print output for first (supposedly best one)
         for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
             sim = self.model_cal.run(named_model_params=paramset,
-                                     plot_results=(idx == 0), plot_title='Calibration '+self.s.calibration_event['name'],
+                                     plot_results=(idx == 0),
+                                     plot_title='{} - Cal {}'.format(self.experiment_name, self.s.calibration_event['name']),
                                      obs_list=self.s.obs_config_validation, run_type='validation')
 
             # The performance here is different from the cost in the iterations file
@@ -94,7 +97,7 @@ class ExperimentRunner(object):
         # plot sampling
         self.calibrator.plot()
 
-        # return the 50 best model parameter sets, inlcuding run number for each
+        # return the 50 best model parameter sets, including run number for each
         self.params_opt, self.params_opt_run_numbers, self.calibration_errors = self.calibrator.getOptimalParams(how_many=count)
         # run calibration model for all parameter sets and print output for first (supposedly best one)
         for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
@@ -119,6 +122,7 @@ class ExperimentRunner(object):
                 initial_conditions=val_event['initial_conditions'],
                 sim_start_dt=val_event['start_dt'],
                 sim_end_dt=val_event['end_dt'],
+                sim_event_name='{}_cal{}_val{}'.format(self.experiment_name, self.s.calibration_event['name'], val_event['name']),
                 sim_reporting_step_sec=self.s.sim_reporting_step_sec,
                 forcing_data_file=self.s.forcing_data_file,
                 obs_available=self.s.obs_available,
@@ -130,7 +134,7 @@ class ExperimentRunner(object):
             # run simulation for each optimal parameter
             for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
                 sim = model_val.run(named_model_params=paramset, plot_results=(idx == 0),  # only plot first (best)
-                                    plot_title='Validation with {} - calibrated on {}'.format(val_event['name'], self.s.calibration_event['name']),
+                                    plot_title='{} - Val {} - Cal {}'.format(self.experiment_name, val_event['name'], self.s.calibration_event['name']),
                                     obs_list=self.s.obs_config_validation, run_type='validation')
                 # evaluate simulation
                 performance = self.obj_fun.evaluate(simulation=sim,
