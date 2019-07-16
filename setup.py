@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name='swmmcalibration',
-    version='0.1.9',
+    version='0.1.10',
     author="Matthew Moy de Vitry",
     author_email="matthew.moydevitry@eawag.ch",
     description="A tool to degrade time series data",

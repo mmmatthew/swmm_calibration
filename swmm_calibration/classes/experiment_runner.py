@@ -110,7 +110,7 @@ class ExperimentRunner(object):
             performance = self.obj_fun.evaluate(simulation=sim,
                                                 evaluation=self.model_cal.obs_validation)
 
-            self.save_results(performance=performance, params=paramset, event_type='calibration', event_name=self.s.calibration_event['name'], run_count=run_number, cal_err=cal_err)
+            self.save_results(performance=performance, params=paramset, event_type='uncalibrated', event_name=self.s.calibration_event['name'], run_count=run_number, cal_err=cal_err)
 
     def evaluate(self):
         # evaluate calibrated model
