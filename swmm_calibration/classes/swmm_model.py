@@ -264,3 +264,6 @@ class SwmmModel(object):
         plt.savefig(os.path.join(self.temp_folder, 'simulation_{title}.png'.format(title=plot_title.lower())))
         plt.clf()
         plt.close()
+
+        # save data for plot
+        df.to_csv(os.path.join(self.temp_folder, 'simulation_{title}_data.csv'.format(title=plot_title.lower())))
