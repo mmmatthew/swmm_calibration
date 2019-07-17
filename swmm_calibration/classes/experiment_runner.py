@@ -129,7 +129,8 @@ class ExperimentRunner(object):
                 obs_config_calibration=self.s.obs_config_calibration,
                 obs_config_validation=self.s.obs_config_validation,
                 cal_params=self.s.calibration_parameters,
-                temp_folder=self.dir
+                temp_folder=self.dir,
+                swmm_exexcutable=self.s.swmm_executable
             )
             # run simulation for each optimal parameter
             for idx, (paramset, run_number, cal_err) in enumerate(zip(self.params_opt, self.params_opt_run_numbers, self.calibration_errors)):
