@@ -67,3 +67,22 @@ class ObjectiveFunction(object):
     def spearman_zero(self, data):
         # make maximum zero instead of one
         return self.spearman(data) - 1
+
+    def spearman_simple_zero(self, data):
+        # a simple speaman function that only accounts for special cases where spearman correlation fails
+        spearman = data.corr(method='spearman')
+        # catch the failing spearman
+        if math.isnan(spearman.iloc[0, 1]):
+            # if both series are always stable, then it is actually a perfect match
+            if math.isnan(spearman.iloc[0, 0]) & math.isnan(spearman.iloc[1, 1]):
+                return 0
+
+            # if one is always stable and the other isn't,
+            if math.isnan(spearman.iloc[0, 0]) != math.isnan(spearman.iloc[1, 1]):
+                # compute and return fraction of matching zeros
+                both_zeros = (data.iloc[:, 0] == 0) & (data.iloc[:, 1] == 0)
+                fraction_matching_zeros = sum(both_zeros) / len(both_zeros)
+                return fraction_matching_zeros - 1
+        # if spearman is successful, return it
+        else:
+            return spearman.iloc[0, 1] - 1
