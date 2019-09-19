@@ -80,7 +80,7 @@ class ObjectiveFunction(object):
             # if one is always stable and the other isn't,
             if math.isnan(spearman.iloc[0, 0]) != math.isnan(spearman.iloc[1, 1]):
                 # compute and return fraction of matching zeros
-                both_zeros = (data.iloc[:, 0] == 0) == (data.iloc[:, 1] == 0)
+                both_zeros = (data.iloc[:, 0] == 0) & (data.iloc[:, 1] == 0)
                 fraction_matching_zeros = sum(both_zeros) / len(both_zeros)
                 return fraction_matching_zeros - 1
         # if spearman is successful, return it
