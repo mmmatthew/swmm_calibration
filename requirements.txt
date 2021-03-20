@@ -11,7 +11,7 @@ enum34==1.1.6
 future==0.17.1
 idna==2.8
 imagesize==1.1.0
-Jinja2==2.10
+Jinja2==2.11.3
 kiwisolver==1.0.1
 mando==0.6.4
 MarkupSafe==1.1.0
